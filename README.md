@@ -1,2 +1,2 @@
 # booking的前端ui
-- [booking后端源码](https://github.com/acodebird/booking)
+- [点击这里跳转到booking后端源码](https://github.com/acodebird/booking)
