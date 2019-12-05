@@ -1,6 +1,6 @@
 <!--管理界面-->
 <template>
- <a-layout id="components-layout-demo-custom-trigger" style="height: 760px; max-height: 760px;">
+ <a-layout id="components-layout-demo-custom-trigger" >
     <a-layout-sider>
       <div class="logo" >客房预订后台管理</div>
       <a-menu theme="dark" mode="inline" :defaultSelectedKeys="['1']" @select="handleSelect">
@@ -31,7 +31,7 @@
         </a-dropdown>
       </a-layout-header>
       <a-layout-content
-        :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '280px' }"
+        :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '647px' }"
       >
         <router-view/>
       </a-layout-content>
