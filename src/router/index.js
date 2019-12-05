@@ -90,7 +90,25 @@ export default new Router({
     {
       path: '/admin',
       name: 'Admin',
-      component: Admin
+      redirect: '/admin/orderManage',
+      component: Admin,
+      children: [
+        {
+          path: '/admin/orderManage',
+          name: 'OrderManage',
+          component: () => import('@/views/admin/OrderManage')
+        },
+        {
+          path: '/admin/userManage',
+          name: 'UserManage',
+          component: () => import('@/views/admin/UserManage')
+        },
+        {
+          path: '/admin/hotelManage',
+          name: 'HotelManage',
+          component: () => import('@/views/admin/HotelManage')
+        }
+      ]
     }
   ]
 })

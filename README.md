@@ -1,2 +1,12 @@
 # booking的前端ui
-- [点击这里跳转到booking后端源码](https://github.com/acodebird/booking)
+## 快速开始
+```javascript
+$ npm install //or cnpm install
+$ npm start
+```
+### 如何进入后台
+- 页脚处有`进入后台`的入口
+- 或者直接在浏览器输入`/admin`
+
+## 后端源码
+[点击这里跳转到booking后端源码](https://github.com/acodebird/booking)
