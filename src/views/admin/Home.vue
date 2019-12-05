@@ -25,8 +25,8 @@
              <a-avatar :src="avatarImg" /> 小泽又沐风 <a-icon type="down" /> 
           </a>
           <a-menu slot="overlay">
-            <a-menu-item key="1"><a-icon type="swap" /><router-link to="/login">切换账号</router-link></a-menu-item>
-            <a-menu-item key="2"><a-icon type="logout" /><router-link to="/">退出</router-link></a-menu-item>
+            <a-menu-item key="1"><router-link to="/login"><a-icon type="swap" />切换账号</router-link></a-menu-item>
+            <a-menu-item key="2"><router-link to="/"><a-icon type="logout" />退出</router-link></a-menu-item>
           </a-menu>
         </a-dropdown>
       </a-layout-header>
