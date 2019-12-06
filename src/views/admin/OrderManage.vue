@@ -93,7 +93,7 @@
     <s-table
       ref="table"
       size="default"
-      rowKey="id"
+      rowKey="oid"
       :columns="columns"
       :data="loadData"
       :alert="options.alert"
@@ -286,21 +286,25 @@ export default {
     },
     // 批量删除
     DeleteIds () {
-      
-      // deleteIds(this.selectedRowKeys)
-      //   .then(res => {
-      //     if (res.success === true) {
-      //       this.$notification.success({
-      //         message: '删除成功'
-      //       })
-      //       this.selectedRowKeys = []
-      //       this.selectedRows = []
-      //       this.$refs.table.refresh(true)
-      //     }
-      //   })
-      //   .catch(err => {
-      //     this.$message.error(`批量删除失败: ${err.message}`)
-      //   })
+      let ids = []
+      for (let i = 0; i < this.selectedRows.length; i++) {
+        ids.push(this.selectedRows[i].oid)
+      }
+      deleteIds(ids)
+        .then(res => {
+          if (res.success === true) {
+            this.$notification.success({
+              message: '删除成功'
+            })
+            this.selectedRowKeys.length = 0
+            this.selectedRows.length = 0
+            this.isDelete = true
+            this.$refs.table.refresh(true)
+          }
+        })
+        .catch(err => {
+          this.$message.error(`批量删除失败: ${err.message}`)
+        })
     },
     tableOption () {
       //    表格选项
