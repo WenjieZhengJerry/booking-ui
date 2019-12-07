@@ -15,6 +15,7 @@ import Admin from '@/views/admin/Home'
 Vue.use(Router)
 
 export default new Router({
+  mode: 'history',
   routes: [
     /* 用户路由注册 */
     {

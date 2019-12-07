@@ -24,27 +24,25 @@ export function toOffsetParam (params) {
   export function parsePage (params) {
     if (params === undefined) {
 			const tempData = []
-			for (let i = 1; i <= 10; ++i) {
-				let status = ''
-				if (i % 5 == 0) status = 'FINISH'
-				else if (i % 4 == 0) status = 'UNPAY'
-				else if (i % 3 == 0) status = 'CANCEL'
-				else status = 'UNUSE'
+			for (let i = 1; i <= 25; ++i) {
 				tempData.push({
-					id: i,
-					orderNumber: '12306',
-					hotel: '维也纳国际酒店',
-					uName: '小泽又沐风',
-					amount: '299.9',
-					orderStatus: status,
-					createTime: '2019-12-5 16:26:37'
+          id: i,
+          img: "../../assets/hotel-demo1.jpg",
+          hname: `维也纳国际酒店${i}`,
+          address: "广东省东莞市大学路1号",
+          description: "于2010年开业，东莞市维也纳国际酒店旗舰店，适合广大人群入驻",
+          service: "接待外宾，叫醒服务",
+          facilities: "停车场,餐厅",
+          phone: "13113112115",
+          rate: 4.8,
+          type: "高档型"
 				});
 			}
       return {
         pageSize: 10,
         pageNo: 1,
-        totalCount: 10,
-        totalPage: 1,
+        totalCount: 25,
+        totalPage: 3,
         data: tempData
       }
     }
