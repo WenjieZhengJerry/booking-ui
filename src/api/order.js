@@ -4,7 +4,7 @@ import {
   } from '@/utils/request'
   
   const api = {
-    order: '/order'
+    order: '/api/orderManage'
   }
   
   // 获取订单列表 parameter: { pageSize: 10, pageNo: 1 }
@@ -25,13 +25,13 @@ import {
   }
   
   // 增加订单
-  export function addOrder (parameter) {
-    return axios({
-      url: api.order,
-      method: 'post',
-      data: parameter
-    })
-  }
+  // export function addOrder (parameter) {
+  //   return axios({
+  //     url: api.order,
+  //     method: 'post',
+  //     data: parameter
+  //   })
+  // }
   
   // 更新订单 // or (id, parameter)
   export function updateOrder (parameter) {
@@ -47,7 +47,6 @@ import {
     return axios({
       url: `${api.order}/${id}`,
       method: 'delete'
-      // ,data: parameter
     })
   }
   
