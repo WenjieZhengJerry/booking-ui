@@ -10,3 +10,6 @@ $ npm start
 
 ## 后端源码
 [点击这里跳转到booking后端源码](https://github.com/acodebird/booking)
+
+## 更新日志
+- 2019年12月9日：完成订单管理单项删除、批量删除、编辑功能

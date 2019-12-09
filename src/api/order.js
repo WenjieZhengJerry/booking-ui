@@ -17,12 +17,12 @@ import {
   }
   
   // 根据订单 id 获取订单信息
-  export function getOrder (id) {
-    return axios({
-      url: `${api.order}/${id}`,
-      method: 'get'
-    })
-  }
+  // export function getOrder (id) {
+  //   return axios({
+  //     url: `${api.order}/${id}`,
+  //     method: 'get'
+  //   })
+  // }
   
   // 增加订单
   // export function addOrder (parameter) {
@@ -36,7 +36,7 @@ import {
   // 更新订单 // or (id, parameter)
   export function updateOrder (parameter) {
     return axios({
-      url: `${api.order}/${parameter.id}`, // or `${api.user}/${id}`
+      url: `${api.order}/${parameter.oid}`, // or `${api.user}/${id}`
       method: 'put',
       data: parameter
     })
