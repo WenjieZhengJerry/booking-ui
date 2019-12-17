@@ -111,10 +111,12 @@
       <span slot="description" slot-scope="text">
         <ellipsis :length="30" tooltip>{{ text }}</ellipsis>
       </span>
-      <!--4.操作以及事件绑定-->
+      <!-- 4.格式化日期 -->
+      <span slot="createTime" slot-scope="text">{{ text | moment }}</span>
+      <!--5.操作以及事件绑定-->
       <span slot="action" slot-scope="text, record">
         <template>
-          <a @click="handleDetail(record)">详情</a>
+          <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
           <a-popconfirm title="是否要删除此行？" @confirm="handleDelete(record)">
             <a>删除</a>
@@ -122,6 +124,7 @@
         </template>
       </span>
     </s-table>
+    <order-edit ref="modal" @ok="handleOk" />	<!--3.使用编辑表单作为子组件-->
   </a-card>
 </a-locale-provider>
 </template>
@@ -132,6 +135,7 @@ import STable from '@/components/Table'
 import Ellipsis from '@/components/Ellipsis'
 import { getOrderList, deleteOrder, deleteIds } from '@/api/order'
 import { parsePage, toOffsetParam } from '@/utils/pageable'
+import OrderEdit from './OrderEdit'	//1.导入编辑表单组件
 
 const orderStatusMap = {
   UNPAY: {
@@ -159,7 +163,8 @@ export default {
     Ellipsis,
     getOrderList,
     deleteOrder,
-    deleteIds
+    deleteIds,
+    OrderEdit
   },
   filters: {
     statusFilter (type) {
@@ -187,12 +192,12 @@ export default {
         },
         {
           title: '入住人',
-          dataIndex: 'user.uname',
+          dataIndex: 'checkInPerson',
           align: 'center'
         },
         {
           title: '总价',
-          dataIndex: 'totalprice',
+          dataIndex: 'totalPrice',
           sorter: true,
           align: 'center'
         },
@@ -204,7 +209,7 @@ export default {
           scopedSlots: { customRender: 'status' }
         },
         {
-          title: '创建时间',
+          title: '下单时间',
           dataIndex: 'createTime',
           sorter: true,
           align: 'center'
@@ -231,6 +236,9 @@ export default {
           })
           .catch(ex => {
             console.log("我异常了" + ex)
+            this.$notification.error({
+              message: '网络连接异常，请稍后再试'
+            })
             return parsePage()
           })
       },
@@ -265,9 +273,13 @@ export default {
       this.form.resetFields();
     },
 
-    handleDetail (record) {
-      console.log(record)
-      this.$refs.modal.edit(record)
+    handleOk() {
+      this.$refs.table.refresh()
+    },
+
+    handleEdit(record) {
+      // console.log(record)
+      this.$refs.modal.edit(record)	//4.打开编辑表单
     },
     // 单项删除
     handleDelete (record) {
@@ -335,6 +347,7 @@ export default {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
       this.selectedRowKeys.length > 0 ? this.isDelete = false : this.isDelete = true
+      console.log(this.selectedRows)
     }
   },
   created: function () {
