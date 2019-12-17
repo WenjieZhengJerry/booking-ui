@@ -24,7 +24,7 @@ export function toOffsetParam (params) {
   export function parsePage (params) {
     if (params === undefined) {
 			const tempData = []
-			for (let i = 1; i <= 25; ++i) {
+			/* for (let i = 1; i <= 25; ++i) {
 				tempData.push({
           id: i,
           img: "../../assets/hotel-demo1.jpg",
@@ -37,12 +37,12 @@ export function toOffsetParam (params) {
           rate: 4.8,
           type: "高档型"
 				});
-			}
+			} */
       return {
         pageSize: 10,
         pageNo: 1,
         totalCount: 25,
-        totalPage: 3,
+        totalPage: 1,
         data: tempData
       }
     }

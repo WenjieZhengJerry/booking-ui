@@ -58,4 +58,3 @@ import {
       data: parameter
     })
   }
-  

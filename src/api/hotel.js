@@ -3,7 +3,7 @@ import {
   } from '@/utils/request'
   
 const api = {
-    hotel: '/hotel'
+    hotel: '/api/hotelManage'
 }
 // 获取酒店列表 parameter: { pageSize: 10, pageNo: 1 }
 export function getHotelList (parameter) {
@@ -23,8 +23,16 @@ export function deleteHotel (id) {
 // 批量删除酒店 parameter: { ids }
 export function deleteHotelAll (parameter) {
     return axios({
-        url: `${api.hotel}/`,
+        url: `${api.hotel}`,
         method: 'delete',
         params: parameter
+    })
+}
+//添加酒店 parameter: {...hotel}
+export function addHotel (parameter) {
+    return axios({
+        url: `${api.hotel}`,
+        method: 'post',
+        data: parameter
     })
 }
