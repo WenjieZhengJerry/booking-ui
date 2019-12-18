@@ -142,7 +142,7 @@ import Ellipsis from '@/components/Ellipsis'
 import moment from 'moment' //日期处理moment.js工具模块
 import { getOrderList, deleteOrder, deleteIds } from '@/api/order'
 import { parsePage, toOffsetParam } from '@/utils/pageable'
-import OrderEdit from './OrderEdit'	//1.导入编辑表单组件
+import OrderEdit from './form/OrderEdit'	//1.导入编辑表单组件
 
 const orderStatusMap = {
   UNPAY: {
