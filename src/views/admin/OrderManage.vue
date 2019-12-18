@@ -6,17 +6,17 @@
       <a-row :gutter="24">
         <a-col key="1" :span="8" >
           <a-form-item label="订单编号">
-            <a-input allowClear v-decorator="['orderNumber']" />
+            <a-input allowClear v-decorator="['oid']" />
           </a-form-item>
         </a-col>
         <a-col key="2" :span="8" >
-          <a-form-item label="用户姓名">
+          <a-form-item label="入住人姓名">
             <a-input allowClear v-decorator="['uName']" />
           </a-form-item>
         </a-col>
         <a-col key="3" :span="8" >
           <a-form-item label="入住时间">
-            <a-date-picker v-decorator="['startTime']" style="width: 200px" />
+            <a-date-picker format="YYYY-MM-DD HH:mm:ss" v-decorator="['startTime']" style="width: 200px" />
           </a-form-item>
         </a-col>
         <a-col key="4" :span="8" >
@@ -25,15 +25,15 @@
               v-decorator="[
                 'orderStatus',
                 {
-                  initialValue: 'all'
+                  initialValue: 'ALL'
                 }
               ]" style="width: 200px"
             >
-              <a-select-option value="all">全部</a-select-option>
-              <a-select-option value="unuse">待入住</a-select-option>
-              <a-select-option value="unpay">待付款</a-select-option>
-              <a-select-option value="success">已完成</a-select-option>
-              <a-select-option value="cancel">已取消</a-select-option>
+              <a-select-option value="ALL">全部</a-select-option>
+              <a-select-option value="UNUSE">待入住</a-select-option>
+              <a-select-option value="UNPAY">待付款</a-select-option>
+              <a-select-option value="SUCCESS">已完成</a-select-option>
+              <a-select-option value="CANCEL">已取消</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -43,12 +43,17 @@
               v-decorator="[
                 'hName',
                 {
-                  initialValue: 'all'
+                  initialValue: 'ALL'
                 }
               ]" style="width: 200px"
             >
-              <a-select-option value="all">全部</a-select-option>
-              <a-select-option value="hotel1">维也纳国际酒店</a-select-option>
+              <a-select-option value="ALL">全部</a-select-option>
+              <a-select-option value="维也纳国际酒店1">维也纳国际酒店1</a-select-option>
+              <a-select-option value="维也纳国际酒店2">维也纳国际酒店2</a-select-option>
+              <a-select-option value="维也纳国际酒店3">维也纳国际酒店3</a-select-option>
+              <a-select-option value="维也纳国际酒店4">维也纳国际酒店4</a-select-option>
+              <a-select-option value="维也纳国际酒店5">维也纳国际酒店5</a-select-option>
+              <a-select-option value="维也纳国际酒店6">维也纳国际酒店6</a-select-option>
             </a-select>
           </a-form-item>
         </a-col>
@@ -57,6 +62,7 @@
             <a-input-number v-decorator="['minPrice']" :min="0" :max="9999" />
             -
             <a-input-number v-decorator="['maxPrice']" :min="0" :max="9999" />
+            <a-button @click="handleCleanPrice" :style="{ marginLeft: '8px' }">清空</a-button>
           </a-form-item>
         </a-col>
       </a-row>
@@ -133,6 +139,7 @@
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import STable from '@/components/Table'
 import Ellipsis from '@/components/Ellipsis'
+import moment from 'moment' //日期处理moment.js工具模块
 import { getOrderList, deleteOrder, deleteIds } from '@/api/order'
 import { parsePage, toOffsetParam } from '@/utils/pageable'
 import OrderEdit from './OrderEdit'	//1.导入编辑表单组件
@@ -222,20 +229,28 @@ export default {
           align: 'center'
         }
       ],
-      // 加载数据方法 必须为 Promise 对象，此处先返回空集合
+      queryValues: {},
+      // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        return getOrderList({ ...parameter, ...this.queryParam })
+        // console.log(parameter)
+        this.form.validateFields((error, values) => {
+          this.queryValues = values
+          if (this.queryValues.startTime !== undefined && this.queryValues.startTime != null) {
+            this.queryValues.startTime = moment(values.startTime).format('YYYY-MM-DD HH:mm:ss')
+          }
+        })
+        return getOrderList({ ...parameter, ...this.queryValues})
           .then(res => {
             if (res.success === true) {
-              console.log("我成功了")
+              // console.log("我成功了")
               return { ...parsePage(res) }
             } else {
-              console.log("我失败了")
+              // console.log("我失败了")
               return parsePage()
             }
           })
           .catch(ex => {
-            console.log("我异常了" + ex)
+            // console.log("我异常了" + ex)
             this.$notification.error({
               message: '网络连接异常，请稍后再试'
             })
@@ -261,22 +276,25 @@ export default {
     }
   },
   methods: {
+    //条件查询一页订单
     handleSearch(e) {
       e.preventDefault();
-      this.form.validateFields((error, values) => {
-        console.log('error', error);
-        console.log('Received values of form: ', values);
-      });
+      this.$refs.table.refresh(true)
     },
-
+    //清空金额区间的值
+    handleCleanPrice() {
+      this.form.setFieldsValue({minPrice: undefined, maxPrice: undefined})
+    },
+    //重置条件
     handleReset() {
       this.form.resetFields();
+      this.$refs.table.refresh(true)
     },
-
+    //保存编辑后的订单
     handleOk() {
       this.$refs.table.refresh()
     },
-
+    //打开编辑订单的modal
     handleEdit(record) {
       // console.log(record)
       this.$refs.modal.edit(record)	//4.打开编辑表单
@@ -342,12 +360,13 @@ export default {
         this.optionAlertShow = false
       }
     },
+    //改变某一个复选框时执行
     onSelectChange (selectedRowKeys, selectedRows) {
       // 表格行选中改变
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
       this.selectedRowKeys.length > 0 ? this.isDelete = false : this.isDelete = true
-      console.log(this.selectedRows)
+      // console.log(this.selectedRows)
     }
   },
   created: function () {

@@ -22,7 +22,7 @@
       <a-layout-header style="background: #fff; padding: 0">
         <a-dropdown style="float: right;">
           <a class="ant-dropdown-link" href="#" style="margin-right: 16px;">
-             <a-avatar :src="avatarImg" /> 小泽又沐风 <a-icon type="down" /> 
+             <a-avatar :src="avatarImg" /> {{ uName }} <a-icon type="down" /> 
           </a>
           <a-menu slot="overlay">
             <a-menu-item key="1"><router-link to="/login"><a-icon type="swap" />切换账号</router-link></a-menu-item>
@@ -40,10 +40,12 @@
 </template>
 
 <script>
+
 export default {
  name: 'Home',
  data () {
     return {
+      uName: '小泽又沐风',
       avatarImg: require('@/assets/user-img-demo.jpg'),
    };
  },

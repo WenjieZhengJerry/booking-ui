@@ -16,14 +16,6 @@ import {
     })
   }
   
-  // 根据订单 id 获取订单信息
-  // export function getOrder (id) {
-  //   return axios({
-  //     url: `${api.order}/${id}`,
-  //     method: 'get'
-  //   })
-  // }
-  
   // 增加订单
   // export function addOrder (parameter) {
   //   return axios({

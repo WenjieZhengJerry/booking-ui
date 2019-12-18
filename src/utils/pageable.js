@@ -23,27 +23,12 @@ export function toOffsetParam (params) {
   
   export function parsePage (params) {
     if (params === undefined) {
-			const tempData = []
-			for (let i = 1; i <= 25; ++i) {
-				tempData.push({
-          id: i,
-          img: "../../assets/hotel-demo1.jpg",
-          hname: `维也纳国际酒店${i}`,
-          address: "广东省东莞市大学路1号",
-          description: "于2010年开业，东莞市维也纳国际酒店旗舰店，适合广大人群入驻",
-          service: "接待外宾，叫醒服务",
-          facilities: "停车场,餐厅",
-          phone: "13113112115",
-          rate: 4.8,
-          type: "高档型"
-				});
-			}
       return {
         pageSize: 10,
         pageNo: 1,
-        totalCount: 25,
-        totalPage: 3,
-        data: tempData
+        totalCount: 0,
+        totalPage: 1,
+        data: []
       }
     }
     const size = params.data.size
@@ -56,7 +41,7 @@ export function toOffsetParam (params) {
       pageNo: number + 1,
       totalCount: totalElements,
       totalPage: totalPages,
-      data: (params && params.data.content) || []
+      data: params.data.content
     }
   }
   
