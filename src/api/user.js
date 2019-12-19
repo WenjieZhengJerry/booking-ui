@@ -31,6 +31,15 @@ export function updateUser (parameter) {
   })
 }
 
+// 批量更新用户 
+export function updateUserBatch (parameter) {
+  return axios({
+    url: `${api.user}`, 
+    method: 'put',
+    data: parameter
+  })
+}
+
 // 删除用户
 export function deleteUser (uid) {
   return axios({

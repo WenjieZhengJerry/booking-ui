@@ -1,60 +1,51 @@
 <!--  -->
 <template>
-  <a-card :busered="false">
-    <!--
-      advanced:高级查询切换显示
-      toggleAdvanced:切换的方法控制advanced
-      resetSearchForm:重置查询表单
-    -->
-    <!--<div class="table-page-search-wrapper">
-      <a-form layout="inline">
-        <a-row :gutter="48">
-          <a-col :md="8" :sm="24">
-            <a-form-item label="订单编号">
-              <a-input v-model="queryParam.userNumber" placeholder />
-            </a-form-item>
-          </a-col>
-
-          <template v-if="advanced">
+  <div>
+    <a-card :busered="false" :bordered="false">
+      <div class="table-page-search-wrapper">
+        <a-form layout="inline">
+          <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item
-                label="起止日期"
-                :labelCol="{lg: {span: 7}, sm: {span: 7}}"
-                :wrapperCol="{lg: {span: 10}, sm: {span: 17} }"
-              >
-                <a-range-picker
-                  v-model="createTime"
-                  name="createTime"
-                  style="width: 100%"
-                  format="YYYY/MM/DD HH:mm:ss"
-                  showTime
-                  @change="onChange"
-                  v-decorator="[
-                    'buildTime',
-                    {rules: [{ required: true, message: '请选择起止日期' }]}
-                  ]"
-                />
+              <a-form-item label="用户名">
+                <a-input v-model="queryParam.uname" placeholder="请输入用户名" />
               </a-form-item>
             </a-col>
-          </template>
-          <a-col :md="!advanced && 8 || 24" :sm="24">
-            <span
-              class="table-page-search-submitButtons"
-              :style="advanced && { float: 'right', overflow: 'hidden' } || {} "
-            >
-              <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-              <a-button style="margin-left: 8px" @click="resetSearchForm">重置</a-button>
-              <a @click="toggleAdvanced" style="margin-left: 8px">
-                {{ advanced ? '收起' : '展开' }}
-                <a-icon :type="advanced ? 'up' : 'down'" />
-              </a>
-            </span>
-          </a-col>
-        </a-row>
-      </a-form>
-    </div>-->
+            <a-col style="float:left">
+              <a-select defaultValue="null" v-model="queryParam.type" style="width: 100px">
+                <a-select-option value="null">不限</a-select-option>
+                <a-select-option value="0">普通用户</a-select-option>
+                <a-select-option value="1">管理员</a-select-option>
+              </a-select>
+              <a-select defaultValue="null" v-model="queryParam.enable" style="width: 80px">
+                <a-select-option value="null">不限</a-select-option>
+                <a-select-option value="true">启用</a-select-option>
+                <a-select-option value="false">停用</a-select-option>
+              </a-select>
+            </a-col>
+            <a-col>
+              <span style="float:left">
+                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+                <a-button style="margin-left: 8px" @click="resetSearchForm">重置</a-button>
+              </span>
+            </a-col>
+            <a-col style="float:right">
+              <a-dropdown>
+                <a-menu slot="overlay" @click="handleMenuBatchClick">
+                  <a-menu-item key="enable"><a-icon type="unlock" theme="twoTone" twoToneColor="#00ffff"/>启用</a-menu-item>
+                  <a-menu-item key="disable"><a-icon type="lock" theme="twoTone" twoToneColor="#ffc0cb"/>停用</a-menu-item>
+                  <a-menu-item key="delete"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/>删除</a-menu-item>
+                </a-menu>
+                <a-button type="primary">
+                  批量操作 <a-icon type="down" />
+                </a-button>
+              </a-dropdown>
+            </a-col>
+          </a-row>
+        </a-form>
+      </div>
+    </a-card>
     <!--
-		rowKey:必须使用唯一标识的字段
+    rowKey:必须使用唯一标识的字段
         columns：表头及列信息
         data：表的数据源调用data属性中的loadData函数获取数据
         alert：数据表格的提示框,显示选中行数等信息
@@ -62,51 +53,52 @@
         showPagination：显示分页
         那么columns、loadData、options都必须在对象的data属性中提前设置。
     -->
-    <!--
-    <a-button type="danger" @click="handleBatchDelete">批量删除</a-button>
-    -->
-    <s-table
-      ref="table"
-      size="default"
-      rowKey="id"
-      :columns="columns"
-      :data="loadData"
-      :alert="options.alert"
-      :rowSelection="options.rowSelection"
-      showPagination="auto"
-    >
-      <!--slot卡槽扩展列表：-->
-      <!--序号-->
-      <span slot="serial" slot-scope="text, record, index">{{ index + 1 }}</span>
-      <!--较长内容使用ellipsis插件省略显示-->
-      <span slot="name" slot-scope="text">
-        <ellipsis :length="10" tooltip>{{ text }}</ellipsis>
-      </span>
-      <!--用户类型：枚举适配显示-->
-      <span slot="type" slot-scope="text">
-        <a-tag :color="text | colorTypeFilter">{{text | typeFilter}}</a-tag>
-        <!--
-        <a-badge :status="text | statusTypeFilter" :text="text | typeFilter" />
+    <a-card :busered="false" :bordered="false">
+      <s-table
+        ref="table"
+        size="default"
+        rowKey="uid"
+        :columns="columns"
+        :data="loadData"
+        :alert="options.alert"
+        :rowSelection="options.rowSelection"
+        showPagination="auto"
+      >
+        <!--slot卡槽扩展列表：-->
+        <!--序号
+        <span slot="serial" slot-scope="text, record, index">{{ index + 1 }}</span>
         -->
-      </span>
-      <!--用户状态：枚举适配显示-->
-      <span slot="status" slot-scope="text,record">
-        <a-switch checkedChildren="启用" unCheckedChildren="停用" :checked="text" @change="changeStatus(!text,record)"/>
-        <!-- 
-        <a-badge :status="text | statusEnableFilter" :text="text | enableFilter" />
-        -->
-      </span>
-      <!--操作以及事件绑定-->
-      <span slot="action" slot-scope="text, record">
-        <template>
-          <a @click="handleEdit(record)">修改</a>
-          <a-divider type="vertical" />
-          <a @click="handleDelete(record.uid)">删除</a>
-        </template>
-      </span>
-    </s-table>
-    <user-edit ref="modal" @ok="handleOk" />
-  </a-card>
+        <!--较长内容使用ellipsis插件省略显示-->
+        <span slot="name" slot-scope="text">
+          <ellipsis :length="10" tooltip>{{ text }}</ellipsis>
+        </span>
+        <!--用户类型：枚举适配显示-->
+        <span slot="type" slot-scope="text">
+          <a-tag :color="text | colorTypeFilter">{{text | typeFilter}}</a-tag>
+        </span>
+        <!--用户状态：枚举适配显示-->
+        <span slot="status" slot-scope="text,record">
+          <a-switch checkedChildren="启用" unCheckedChildren="停用" :checked="text" @change="changeStatus(!text,record)"/>
+        </span>
+        <!--操作以及事件绑定-->
+        <span slot="check" slot-scope="text, record">
+          <template>
+            <a @click="handleEdit(record)"><a-icon type="user" /></a>
+            <a-divider type="vertical" />
+            <a @click="handleDelete(record.uid)"><a-icon type="ordered-list"/></a>
+           </template>
+        </span>
+        <span slot="action" slot-scope="text, record">
+          <template>
+            <a @click="handleEdit(record)"><a-icon type="edit" /></a>
+            <a-divider type="vertical" />
+            <a @click="handleDelete(record.uid)"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/></a>
+          </template>
+        </span>
+      </s-table>
+      <user-edit ref="modal" @ok="handleOk" />
+    </a-card>
+  </div>
 </template>
 
 <script>
@@ -114,7 +106,7 @@
 // 例如：import 《组件名称》 from '《组件路径》';
 import STable from '@/components/Table'
 import Ellipsis from '@/components/Ellipsis'
-import { getUsers, deleteUser, deleteUserBatch, updateUser } from '@/api/user'
+import { getUsers, deleteUser, deleteUserBatch, updateUser, updateUserBatch } from '@/api/user'
 import { parsePage } from '@/utils/pageable'
 import UserEdit from './form/UserEdit'
 const userTypeMap = {
@@ -129,18 +121,6 @@ const userTypeMap = {
     color: 'red'
   }
 }
-// const userEnableMap = {
-//   false: {
-//     status: false,
-//     // status: 'warning',
-//     text: '不可用'
-//   },
-//   true: {
-//     status: true,
-//     // status: 'error',
-//     text: '可用'
-//   }
-// }
 export default {
   name: 'UserManage',
   // import引入的组件需要注入到对象中才能使用
@@ -149,28 +129,17 @@ export default {
     Ellipsis,
     UserEdit
   },
-  	// private Long uid; //用户主键
-	// private String uname; //用户名
-	// private String upassword; //用户密码
-	// private String salt; //用户密码盐
-	// private String email; //用户邮箱
-	// @Size(min=11,max=11)
-	// private String telephone; //用户电话
-	// private Integer type; //用户类型（0表示普通用户、1表示管理员）
-	// private String icon; //用户头像
-	// private Boolean enable; //用户可用性（0表示不可用，1表示可用）
   data () {
     // 这里存放数据
     return {
-      // 快捷查询和高级查询切换
-      advanced: false,
       // 查询条件
-      queryParam: {},
+      queryParam: {
+        uname:null,
+        type:'null',
+        enable:'null',
+      },
+      queryParamBack: {},
       columns: [
-        {
-          title: '#',
-          scopedSlots: { customRender: 'serial' }
-        },
         {
           title: '用户id',
           dataIndex: 'uid'
@@ -197,19 +166,27 @@ export default {
           title: '状态',
           dataIndex: 'enable',
           scopedSlots: { customRender: 'status' },
-          sorter: true
+        },
+        {
+          title: '查看',
+          dataIndex: 'check',
+          width: '100px',
+          scopedSlots: { customRender: 'check' }
         },
         {
           title: '操作',
           dataIndex: 'action',
-          width: '150px',
+          width: '100px',
           scopedSlots: { customRender: 'action' }
         }
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         console.log('loadData.parameter', parameter)
-        return getUsers({ ...parameter, ...this.queryParam }).then(res => {
+        this.queryParamBack.uname=this.queryParam.uname;
+        this.queryParamBack.type='null'===this.queryParam.type?null:this.queryParam.type;
+        this.queryParamBack.enable='null'===this.queryParam.enable?null:this.queryParam.enable;
+        return getUsers({ ...parameter, ...this.queryParamBack }).then(res => {
           if (res.success === true) {
             return { ...parsePage(res) }
           } else {
@@ -258,30 +235,7 @@ export default {
       console.log(recordId)
       deleteUser(recordId).then(res => {
         if (res.success === true) {
-          this.$notification.success({
-            message: '删除成功'
-          })
-          this.$refs.table.refresh(true)
-        }
-      })
-        .catch(err => {
-          $message.error(`删除失败: ${err.message}`)
-        })
-    },
-    handleBatchDelete () {
-      if (this.selectedRowKeys.length < 1) {
-        this.$notification.warning({
-          message: '请选择数据'
-        })
-        return
-      }
-      deleteBatchUser(this.selectedRowKeys).then(res => {
-        console.log(res)
-        if (res.success === true) {
-          this.selectedRowKeys = []
-          this.$notification.success({
-            message: '删除成功'
-          })
+          this.$notification.success({message: '删除成功'})
           this.$refs.table.refresh(true)
         }
       })
@@ -293,9 +247,7 @@ export default {
       record.enable=newEnable
       updateUser(record).then(res => {
         if (res.success === true) {
-          this.$notification.success({
-            message: '更新成功'
-          })
+          this.$notification.success({message: '更新成功'})
           this.$refs.table.refresh(true)
         }
       })
@@ -303,24 +255,62 @@ export default {
           $message.error(`更新失败: ${err.message}`)
         })
     },
+    handleMenuBatchClick (menu) {
+      if (this.selectedRowKeys.length < 1) {
+        this.$notification.warning({message: '请选择数据'})
+        return
+      }
+      if("enable"===menu.key){
+        this.changeStatusBatch(true,this.selectedRows);
+      }
+      else if("disable"===menu.key){
+        this.changeStatusBatch(false,this.selectedRows);
+      }
+      else if("delete"===menu.key){
+        this.handleDeleteBatch();
+      }
+    },
+    changeStatusBatch (newEnable, records) {
+      records.forEach(element => {
+        element.enable=newEnable;
+      });
+      updateUserBatch(records).then(res => {
+        if (res.success === true) {
+          this.$notification.success({message: '更新成功'})
+          this.$refs.table.refresh(true)
+        }
+      })
+        .catch(err => {
+          $message.error(`更新失败: ${err.message}`)
+        })
+    },
+    handleDeleteBatch () {
+      deleteUserBatch(this.selectedRowKeys).then(res => {
+        if (res.success === true) {
+          this.selectedRowKeys=[]
+          this.$notification.success({message: '删除成功'})
+          this.$refs.table.refresh(true)
+        }
+      })
+        .catch(err => {
+          $message.error(`删除失败: ${err.message}`)
+        })
+    },
     // 时间区间日历组件发送改变时 重新生成查询条件
-    // onChange (dates, dateStrings) {
-    //   console.log('From: ', dates[0], ', to: ', dates[1])
-    //   console.log('From: ', dateStrings[0], ', to: ', dateStrings[1])
-    //   this.queryParam = {
-    //     createTimeStart: dateStrings[0],
-    //     createTimeEnd: dateStrings[1]
-    //   }
-    // },
-    // 切换方法
-    toggleAdvanced () {
-      this.advanced = !this.advanced
+    onChange (dates, dateStrings) {
+      console.log('From: ', dates[0], ', to: ', dates[1])
+      console.log('From: ', dateStrings[0], ', to: ', dateStrings[1])
+      this.queryParam = {
+        createTimeStart: dateStrings[0],
+        createTimeEnd: dateStrings[1]
+      }
     },
     // 表单和查询条件重置
-    // resetSearchForm () {
-    //   this.queryParam = {}
-    //   this.createTime = undefined
-    // },
+    resetSearchForm () {
+      this.queryParam.uname=null,
+      this.queryParam.type='null',
+      this.queryParam.enable='null'
+    },
     tableOption () {
       // 表格选项
       if (!this.optionAlertShow) {
@@ -381,13 +371,6 @@ export default {
     colorTypeFilter (type) {
       return userTypeMap[type].color
     }
-    // ,
-    // enableFilter (type) {
-    //   return userEnableMap[type].text
-    // },
-    // statusEnableFilter (type) {
-    //   return userEnableMap[type].status
-    // }
   }
 }
 </script>
