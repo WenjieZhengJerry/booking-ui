@@ -4,31 +4,35 @@
     <a-card :busered="false" :bordered="false">
       <div class="table-page-search-wrapper">
         <a-form layout="inline">
-          <a-row :gutter="48">
-            <a-col :md="8" :sm="24">
+          <a-row :gutter="0">
+            <a-col style="float:left">
               <a-form-item label="用户名">
                 <a-input v-model="queryParam.uname" placeholder="请输入用户名" />
               </a-form-item>
             </a-col>
             <a-col style="float:left">
-              <a-select defaultValue="null" v-model="queryParam.type" style="width: 100px">
-                <a-select-option value="null">不限</a-select-option>
-                <a-select-option value="0">普通用户</a-select-option>
-                <a-select-option value="1">管理员</a-select-option>
-              </a-select>
-              <a-select defaultValue="null" v-model="queryParam.enable" style="width: 80px">
-                <a-select-option value="null">不限</a-select-option>
-                <a-select-option value="true">启用</a-select-option>
-                <a-select-option value="false">停用</a-select-option>
-              </a-select>
+              <a-form-item label="用户类型">
+                <a-select defaultValue="null" v-model="queryParam.type" style="width: 100px">
+                  <a-select-option value="null">不限</a-select-option>
+                  <a-select-option value="0">普通用户</a-select-option>
+                  <a-select-option value="1">管理员</a-select-option>
+                </a-select>
+              </a-form-item>
+              <a-form-item label="用户状态">
+                <a-select defaultValue="null" v-model="queryParam.enable" style="width: 80px">
+                  <a-select-option value="null">不限</a-select-option>
+                  <a-select-option value="true">启用</a-select-option>
+                  <a-select-option value="false">停用</a-select-option>
+                </a-select>
+              </a-form-item>
             </a-col>
             <a-col>
-              <span style="float:left">
+              <a-form-item label="">
                 <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
                 <a-button style="margin-left: 8px" @click="resetSearchForm">重置</a-button>
-              </span>
+              </a-form-item>
             </a-col>
-            <a-col style="float:right">
+            <a-col style="float:left;margin-top:20px;margin-bottom:-20px;">
               <a-dropdown>
                 <a-menu slot="overlay" @click="handleMenuBatchClick">
                   <a-menu-item key="enable"><a-icon type="unlock" theme="twoTone" twoToneColor="#00ffff"/>启用</a-menu-item>
@@ -36,7 +40,7 @@
                   <a-menu-item key="delete"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/>删除</a-menu-item>
                 </a-menu>
                 <a-button type="primary">
-                  批量操作 <a-icon type="down" />
+                  批处理 <a-icon type="down" />
                 </a-button>
               </a-dropdown>
             </a-col>
@@ -83,20 +87,17 @@
         <!--操作以及事件绑定-->
         <span slot="check" slot-scope="text, record">
           <template>
-            <a @click="handleEdit(record)"><a-icon type="user" /></a>
+            <a @click="handleCheck(record)" title="查看用户信息"><a-icon type="user" /></a>
+            <a-divider type="vertical" />
+            <a @click="handleDelete(record.uid)" title="删除用户"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/></a>
+            <!--
             <a-divider type="vertical" />
             <a @click="handleDelete(record.uid)"><a-icon type="ordered-list"/></a>
+            -->
            </template>
         </span>
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleEdit(record)"><a-icon type="edit" /></a>
-            <a-divider type="vertical" />
-            <a @click="handleDelete(record.uid)"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/></a>
-          </template>
-        </span>
       </s-table>
-      <user-edit ref="modal" @ok="handleOk" />
+      <user-check ref="modal" />
     </a-card>
   </div>
 </template>
@@ -108,7 +109,7 @@ import STable from '@/components/Table'
 import Ellipsis from '@/components/Ellipsis'
 import { getUsers, deleteUser, deleteUserBatch, updateUser, updateUserBatch } from '@/api/user'
 import { parsePage } from '@/utils/pageable'
-import UserEdit from './form/UserEdit'
+import UserCheck from './form/UserCheck'
 const userTypeMap = {
   '0': {
     type: 'warning',
@@ -127,7 +128,7 @@ export default {
   components: {
     STable,
     Ellipsis,
-    UserEdit
+    UserCheck
   },
   data () {
     // 这里存放数据
@@ -168,16 +169,10 @@ export default {
           scopedSlots: { customRender: 'status' },
         },
         {
-          title: '查看',
+          title: '查看/操作',
           dataIndex: 'check',
           width: '100px',
           scopedSlots: { customRender: 'check' }
-        },
-        {
-          title: '操作',
-          dataIndex: 'action',
-          width: '100px',
-          scopedSlots: { customRender: 'action' }
         }
       ],
       // 加载数据方法 必须为 Promise 对象
@@ -224,9 +219,9 @@ export default {
   },
   // 方法集合
   methods: {
-    handleEdit (record) {
-      console.log(record)
-      this.$refs.modal.edit(record)
+    handleCheck (record) {
+      this.$refs.modal.data=record
+      this.$refs.modal.show(record)
     },
     handleOk () {
       this.$refs.table.refresh()
@@ -375,5 +370,6 @@ export default {
 }
 </script>
 <style>
+
 
 </style>
