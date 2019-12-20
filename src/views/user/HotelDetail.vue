@@ -31,8 +31,8 @@
           </div>
           <div class="info-detail">
             <div class="main-section">
-              <h1>{{ hotel.hName }}</h1>
-              <a-tag color="blue">{{ hotel.type }}</a-tag>
+              <h1>{{ hotel.hname }}</h1>
+              <a-tag color="blue">{{ hotel.type | hotelTypeFilter }}</a-tag>
               <div class="address">
                 <p :style="{ margin: 0, padding: 0 }">地址：{{ hotel.address }}</p>
                 <p :style="{ margin: 0, padding: 0 }">电话：{{ hotel.phone }}</p>
@@ -50,8 +50,10 @@
         </div>
         <div class="hotel-room">
           <div class="room-date">
-            <label>日期</label>&nbsp;&nbsp;
-            <a-range-picker />&nbsp;&nbsp;
+            <label>入住日期</label>&nbsp;&nbsp;
+            <a-date-picker v-model="startTime"/>&nbsp;&nbsp;
+            <label>离店日期</label>&nbsp;&nbsp;
+            <a-date-picker v-model="endTime"/>&nbsp;&nbsp;
             <a-button type="primary">
               确认修改
             </a-button>
@@ -80,33 +82,33 @@
               <a-col :span="6">
                 <img src="@/assets/room-demo.jpg" style="width: 250px">
                 <div class="room-img-section">
-                  {{ room.roomType }}
+                  {{ room.rname }}
                   <a-tooltip placement="right">
-                    <template slot="title" v-for="(addition, index) in room.additions">
-                      <span :key="index">{{ addition }}<br></span>
+                    <template slot="title" v-for="(assition, index) in room.assitions.split(',')">
+                      <span :key="index">{{ assition }}<br></span>
                     </template>
                     <span>详情</span>
                   </a-tooltip>
                   </div>
               </a-col>
-              <a-col :span="18" class="room-detail" v-for="(detail, index) in room.details" :key="index">
+              <a-col :span="18" class="room-detail">
                 <a-col :span="4">
-                  {{ detail.priceType }}
+                  {{ room.type | roomTypeFilter }}
                 </a-col>
                 <a-col :span="4">
-                  {{ detail.breakfast }}
+                  {{ room.breakfast }}
                 </a-col>
                 <a-col :span="4">
-                  {{ detail.cancel }}
+                  {{ room.cancel }}
                 </a-col>
                 <a-col :span="4">
-                  <a-icon type="user" /> <span v-if="detail.people > 1"> x{{ detail.people }}</span>
+                  <a-icon type="user" /> x{{ room.people }}
                 </a-col>
                 <a-col :span="4">
-                  ￥<span class="price">{{ detail.price }}</span>
+                  ￥<span class="price">{{ room.price }}</span>
                 </a-col>
                 <a-col :span="4">
-                  <a-button class="book-btn" @click="bookNow">立即预订</a-button>
+                  <a-button class="book-btn" @click="bookNow(room)">立即预订</a-button>
                 </a-col>
               </a-col>
             </a-row>
@@ -142,7 +144,7 @@
               <div id="hotel-facilities" class="tab-pane">
                 <h4>酒店设施</h4>
                 <ul class="list">
-                  <li v-for="(facility, index) in hotelFacilities" :key="index">
+                  <li v-for="(facility, index) in hotel.facilities.split(',')" :key="index">
                     <a-icon type="check" />{{ facility }}
                   </li>
                 </ul>
@@ -150,7 +152,7 @@
               <div id="hotel-service" class="tab-pane">
                 <h4>酒店服务</h4>
                 <ul class="list">
-                  <li v-for="(service, index) in hotelService" :key="index">
+                  <li v-for="(service, index) in hotel.service.split(',')" :key="index">
                     <a-icon type="check" /> {{ service }}
                   </li>
                 </ul>
@@ -315,6 +317,40 @@
 import zh_CN from "ant-design-vue/lib/locale-provider/zh_CN";
 import Header from "./Header";
 import Footer from "./Footer";
+import moment from 'moment';
+
+const hotelTypesMap = {
+  APARTMENT: {
+    text: '公寓'
+  },
+  HOMESTAY: {
+    text: '民宿'
+  },
+  HOSTEL: {
+    text: '青旅'
+  },
+  ECONOMY: {
+    text: '经济连锁'
+  },
+  HIGNEND: {
+    text: '高级连锁'
+  }
+}
+
+const roomTypesMap = {
+  STANDARD: {
+    text: '标准房'
+  },
+  SUPERIOR: {
+    text: '高级房'
+  },
+  DELUXE: {
+    text: '豪华房'
+  },
+  BUSINESS: {
+    text: '商务房'
+  },
+}
 
 export default {
   name: "HotelDetail",
@@ -322,108 +358,40 @@ export default {
     "v-header": Header,
     "v-footer": Footer
   },
+  filters: {
+    hotelTypeFilter (type) {
+      return hotelTypesMap[type].text
+    },
+    roomTypeFilter (type) {
+      return roomTypesMap[type].text
+    }
+    // ,
+    // serviceFilter (service) {
+    //   return serviceMap[service].icon
+    // }
+  },
+  created: function() {
+    this.hotel = this.$route.params.hotelDetail.hotel
+    this.rooms = this.$route.params.hotelDetail.rooms
+  },
   data() {
     return {
       zh_CN,
       reviewUserImg: require('@/assets/user-img-demo.jpg'),
-      hotel: {
-        hName: '锦江国际饭店',
-        address: '上海市黄浦区南京西路170号',
-        phone: '86-21-63275225',
-        distance: 1.1,
-        type: '高档型',
-        rate: 4.9,
-        description: '国际饭店开业于1934年，是一家闻名遐迩的著名老饭店，民国23年，根据《申报》记载，国际饭店是当时东半球最高之楼。2006年起被评为“全国重点文物保护单位”；先后获得“中华老字号企业”、“上海市著名商标”等称号、“国际饭店京帮点心制作技艺”被列入上海市非物质文化遗产名录。酒店位于“上海坐标原点”，地处繁华的南京路，对面是风景如画的人民公园，地理位置优越，交通便利。如今饭店在保留优秀传统的基础上，进行了一系列的创新举措与整修，豪华舒适的客房，先进的会议娱乐设施、独具特色的美食、具有历史意义的名人墙、美术家之家、怀旧角和历史陈列馆，这些都向您充分展示了饭店悠久的历史和文化。国际饭店一直以来依靠传承发展的企业文化、与时俱进的服务理念，现代化的管理模式，打造出驰誉中外、独具特色的经典知名品牌。'
+      startTime: moment(),
+      endTime: undefined,
+      user: {
+        uid: 1,
+        email: '1234567890@qq.com',
+        enable: 1,
+        icon: 'xxx',
+        telephone: '12345678910',
+        type: 1,
+        uname: '小泽又沐风'
       },
+      hotel: {},
       hotelImgs: [],
-      rooms: [
-        {
-          img: '',
-          roomType: '标准单人房',
-          additions: ['床型：单床 1.2米', '面积：12㎡', '楼层：3-8、10', '不允许加床', '外窗', '有无烟房'],
-          details: [
-            {
-              priceType: '官方专享价',
-              breakfast: '不含早',
-              cancel: '限时取消',
-              people: 1,
-              price: 598
-            },
-            {
-              priceType: '尊享普卡价 ',
-              breakfast: '不含早',
-              cancel: '限时取消',
-              people: 1,
-              price: 750
-            },
-            {
-              priceType: '最优公开价',
-              breakfast: '不含早',
-              cancel: '免费取消',
-              people: 1,
-              price: 798
-            }
-          ]
-        },
-        {
-          img: '',
-          roomType: '豪华双床房',
-          additions: ['床型：单床 1.2米', '面积：12㎡', '楼层：3-8、10', '不允许加床', '外窗', '有无烟房'],
-          details: [
-            {
-              priceType: '官方专享价',
-              breakfast: '不含早',
-              cancel: '限时取消',
-              people: 2,
-              price: 598
-            },
-            {
-              priceType: '尊享普卡价 ',
-              breakfast: '不含早',
-              cancel: '限时取消',
-              people: 2,
-              price: 750
-            },
-            {
-              priceType: '最优公开价',
-              breakfast: '不含早',
-              cancel: '免费取消',
-              people: 2,
-              price: 798
-            }
-          ]
-        },
-        {
-          img: '',
-          roomType: '豪华双床房',
-          additions: ['床型：单床 1.2米', '面积：12㎡', '楼层：3-8、10', '不允许加床', '外窗', '有无烟房'],
-          details: [
-            {
-              priceType: '官方专享价',
-              breakfast: '不含早',
-              cancel: '限时取消',
-              people: 2,
-              price: 598
-            },
-            {
-              priceType: '尊享普卡价 ',
-              breakfast: '不含早',
-              cancel: '限时取消',
-              people: 2,
-              price: 750
-            },
-            {
-              priceType: '最优公开价',
-              breakfast: '不含早',
-              cancel: '免费取消',
-              people: 2,
-              price: 798
-            }
-          ]
-        }
-      ],
-      hotelFacilities: ['电梯', 'Spa', '酒吧', '健身房', '理发美容室', '精品店', '夜总会', '高射投影仪', '会议设备', '餐厅', '休息室', '美容院', '视听设备', '蒸汽浴', '迪斯科', '桑拿浴'],
-      hotelService: ['叫醒服务', '24小时保安', '24小时前台服务', '自助早餐', '24小时送餐服务', '旅游票务服务', '礼品店', '时钟/闹钟'],
+      rooms: [],
       comments: [
         {
           avatar: '',
@@ -480,8 +448,26 @@ export default {
     };
   },
   methods: {
-    bookNow: function() {
-      this.$router.push('/confirmOrder')
+    moment,
+    bookNow: function(room) {
+      if (this.startTime == undefined || this.startTime == null) {
+        this.$message.error("请选择入住日期")
+        return
+      }
+      if (this.endTime == undefined || this.endTime == null) {
+        this.$message.error("请选择离店日期")
+        return
+      }
+      this.$router.push({
+        name: 'ConfirmOrder',
+        params: {
+          startTime: this.startTime,
+          endTime: this.endTime,
+          hotel: this.hotel,
+          room: room,
+          user: this.user
+        }
+      })
     }
   }
 };

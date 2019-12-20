@@ -115,7 +115,7 @@
           <a-col :span="24">
             <div class="tag-div">
               <div class="result">
-                查询到<span>132</span>家酒店
+                查询到<span>{{ pagination.totalElements }}</span>家酒店
               </div>
               <template v-for="tag in tags">
                 <a-tag :key="tag" :closable="true" :afterClose="() => handleClose(tag)" :style="{ marginTop: '2px' }">
@@ -139,14 +139,14 @@
                     <a href="javascript:;" @click="goTo"><img src="@/assets/hotel-demo1.jpg" /></a>
                   </div>
                   <div class="middle">
-                    <p class="h-name"><a href="javascript:;" @click="goTo">{{ hotel.hName }}</a></p>
+                    <p class="h-name"><a href="javascript:;" @click="goTo">{{ hotel.hname }}</a></p>
                     <p>地址：{{ hotel.address }}</p>
-                    <p>距离市中心 {{ hotel.distance }} km</p>
-                    <a-tag color="blue">{{ hotel.type }}</a-tag>
+                    <!-- <p>距离市中心 {{ hotel.distance }} km</p> -->
+                    <a-tag color="blue">{{ hotel.type | hotelTypeFilter }}</a-tag>
                     <div :style="{ color: '#bdbdbd', marginTop: '10px' }">
-                      <a-icon type="coffee" /> 餐厅 &nbsp;
-                      <a-icon type="car" /> 停车场 &nbsp;
-                      <a-icon type="team" /> 接待外宾
+                      <template v-for="service in hotel.service.split(',')">
+                        <a-icon :key="service" :type="service | serviceFilter" /> {{ service }} &nbsp;
+                      </template>
                     </div>
                   </div>
                   <div class="rate">
@@ -155,7 +155,7 @@
                   </div>
                   <div class="more">
                     ￥<span class="price">{{ hotel.minPrice }}</span>起
-                    <a-button @click="goTo" class="detail-btn">查看详情</a-button>
+                    <a-button @click="goTo(hotel.hid)" class="detail-btn">查看详情</a-button>
                   </div>
                 </div>  
               </template> 
@@ -164,8 +164,16 @@
               <a-empty description="找不到符合条件的酒店" :style="{ margin: '20px 0' }" />
             </div>
             <!-- 分页 -->
-            <div class="pagination" v-if="hotels.length != 0">
-              <a-pagination showQuickJumper :defaultCurrent="1" :defaultPageSize="10" :total="100" />
+            <div class="pagination" v-if="pagination.totalElements != 0">
+              <a-pagination
+                v-model="pagination.pageNo"
+                showSizeChanger
+                :defaultCurrent="pagination.pageNo"
+                :defaultPageSize="pagination.pageSize"
+                :total="pagination.totalElements"
+                @change="handleChangePage"
+                @showSizeChange="onShowSizeChange"
+              />
             </div>
           </a-col>
           <!-- 待开发 -->
@@ -187,15 +195,60 @@
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
+import { getHotelList, getHotelDetail } from '@/api/hotel'
+
+const hotelTypesMap = {
+  APARTMENT: {
+    text: '公寓'
+  },
+  HOMESTAY: {
+    text: '民宿'
+  },
+  HOSTEL: {
+    text: '青旅'
+  },
+  ECONOMY: {
+    text: '经济连锁'
+  },
+  HIGNEND: {
+    text: '高级连锁'
+  }
+}
+
+const serviceMap = {
+  '接待外宾': {
+    icon: 'team'
+  },
+  '餐厅': {
+    icon: 'coffee'
+  },
+  '停车场': {
+    icon: 'car'
+  },
+  '叫醒服务': {
+    icon: 'bell'
+  }
+}
 
 export default {
- name: 'Home',
- data () {
+  name: 'Home',
+  created: function() {
+    this.loadHotel()
+  },
+  filters: {
+    hotelTypeFilter (type) {
+      return hotelTypesMap[type].text
+    },
+    serviceFilter (service) {
+      return serviceMap[service].icon
+    }
+  },
+  data () {
     return {
       zh_CN,
       locations: ['商圈/地标', '机场/火车站', '轨道交通', '行政区', '景点'],
       brands: ['昆仑', '锦江', '希岸', '维也纳酒店', '白玉兰', '凯里亚德（中国）', '丽笙', '希尔顿欢朋', 'IU酒店', '7天优品', '丽枫', '郁锦香', '锦江都城'],
-      rates: ['经济型', '舒适型', '高档型', '豪华型'],
+      rates: ['公寓', '民宿', '青旅', '经济连锁', '高级连锁'],
       locationDefault: '不限',
       brandDefault: '不限',
       brandNums: [],
@@ -207,47 +260,19 @@ export default {
       maxPrice: 9999,
       tags: [],
       cleanBtn: false,
-      hotels: [
-        {
-          img: '',
-          hName: '锦江国际饭店',
-          address: '上海市黄浦区南京西路170号',
-          distance: 1.1,
-          type: '高档型',
-          rate: 4.9,
-          minPrice: 1058
-        },
-        {
-          img: '',
-          hName: '锦江国际饭店',
-          address: '上海市黄浦区南京西路170号',
-          distance: 1.1,
-          type: '高档型',
-          rate: 4.9,
-          minPrice: 1058
-        },
-        {
-          img: '',
-          hName: '锦江国际饭店',
-          address: '上海市黄浦区南京西路170号',
-          distance: 1.1,
-          type: '高档型',
-          rate: 4.9,
-          minPrice: 1058
-        }
-      ]
+      queryParam: {},
+      pagination: {},
+      hotels: []
     };
- },
+  },
 
- components: {
+  components: {
     'v-header': Header,
     'v-footer': Footer
   },
 
- computed: {},
-
  methods: {
-   locationChange: function(e) {
+    locationChange: function(e) {
       if (e.target.value == '不限') {
         const locTags = this.tags.filter(tag => this.locations.includes(tag))
         this.tags = this.tags.filter(tag => !locTags.includes(tag))
@@ -401,8 +426,53 @@ export default {
       this.curValue = null
       this.cleanBtn = true
     },
-    goTo: function() {
-      this.$router.push('/hotelDetail')
+    goTo: function(id) {
+      getHotelDetail(id)
+        .then(res => {
+          if (res.success == true) {
+            this.$router.push({
+              name: 'HotelDetail',
+              params: { 
+                hotelDetail: res.data 
+              }
+            })
+          } else {
+            this.$message.error(`获取酒店失败: ${res.data}`)
+          }
+        })
+        .catch(err => {
+          this.$message.error(`获取酒店异常: ${err.message}`)
+        })
+    },
+    loadHotel: function() {
+      getHotelList({...this.pagination})
+      .then(res => {
+        if (res.success == true) {
+          // console.log("加载酒店成功")
+          this.hotels = res.data.content
+          this.pagination = {
+            pageNo: res.data.number + 1,
+            pageSize: res.data.size,
+            sortField: 'rate',
+            sortOrder: 'descend',
+            totalElements: res.data.totalElements
+          }
+        } else {
+          this.$message.error(`加载酒店失败: ${res.data}`)
+        }
+      })
+      .catch(err => {
+        this.$message.error(`加载酒店异常: ${err.message}`)
+      })
+    },
+    handleChangePage: function(pageNo) {
+      this.pagination.pageNo = pageNo
+      this.loadHotel()
+    },
+    onShowSizeChange: function(pageNo, pageSize) {
+      this.pagination.pageNo = pageNo
+      this.pagination.pageSize = pageSize
+      this.loadHotel()
     }
  }
 }
@@ -436,6 +506,7 @@ export default {
   .content-div {
     background: #fff;
     padding: 0 50px;
+    min-height: 600px;
   }
 
   .tag-div {

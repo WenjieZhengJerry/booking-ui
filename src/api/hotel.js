@@ -36,3 +36,13 @@ export function addHotel (parameter) {
         data: parameter
     })
 }
+
+/*-----------------------------------------------------------------------*/
+
+//获取酒店详细信息
+export function getHotelDetail (id) {
+    return axios({
+        url: `${api.hotel}/${id}`,
+        method: 'get'
+    })
+}

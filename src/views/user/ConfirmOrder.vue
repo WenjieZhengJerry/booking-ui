@@ -9,17 +9,17 @@
           <div class="title">预订信息</div>
           <div class="input-box">
             <label>入住日期：</label>
-            <a-date-picker class="input-box-2" :defaultValue="moment('2019-11-28', 'YYYY-MM-DD')" disabled />
+            <a-date-picker class="input-box-2" :defaultValue="startTime" disabled />
             <label>离店日期：</label>
-            <a-date-picker class="input-box-2" :defaultValue="moment('2015-11-30', 'YYYY-MM-DD')" disabled />
+            <a-date-picker class="input-box-2" :defaultValue="endTime" disabled />
             <label>房间数量：</label>
-            <a-select defaultValue="1" style="width: 120px">
+            <a-select v-model="count" style="width: 120px">
               <a-select-option value="1">1</a-select-option>
               <a-select-option value="2">2</a-select-option>
               <a-select-option value="3">3</a-select-option>
             </a-select>
           </div>
-          <div class="hotel-box">
+          <!-- <div class="hotel-box">
             <div class="hotel">
               <span>11月28日</span>
               <span>2间</span>
@@ -32,7 +32,7 @@
               <span>含单早</span>
               <span style="color: #fd5c08;">￥1800.00</span>
             </div>
-          </div>
+          </div> -->
           <div class="gift-box">
             <div class="gift-notice">
               <a-icon type="gift" theme="twoTone" />
@@ -45,9 +45,9 @@
           <div class="title">入住信息</div>
           <div class="input-box">
             <label>联系人：</label>
-            <a-input class="input-box-2" style="width: 150px" placeholder="真实姓名" allowClear/>
+            <a-input class="input-box-2" v-model="checkInPerson" style="width: 150px" placeholder="真实姓名" allowClear/>
             <label>手机号码：</label>
-            <a-input class="input-box-2" style="width: 180px" maxlength="11" placeholder="仅支持大陆手机号码" allowClear/>
+            <a-input class="input-box-2" v-model="telephone" style="width: 180px" maxlength="11" placeholder="仅支持大陆手机号码" allowClear/>
           </div>
           <div class="input-box">
             <div>
@@ -72,27 +72,27 @@
           <div class="input-box">
             <label>特殊需求</label>
             <br>
-            <a-checkbox-group class="special-need">
-              <a-checkbox value="0" style="width: 0" /> <span>无烟房</span>
-              <a-checkbox value="1" style="width: 0" /> <span>高层客房</span>
-              <a-checkbox value="2" style="width: 0" /> <span>相邻房</span>
-              <a-checkbox value="3" style="width: 0" :defaultChecked="isRemarked" @change="remark" /> <span>备注</span>
+            <a-checkbox-group class="special-need" @change="handleChangeRemark">
+              <a-checkbox value="无烟房" style="width: 0" /> <span>无烟房</span>
+              <a-checkbox value="高层客房" style="width: 0" /> <span>高层客房</span>
+              <a-checkbox value="相邻房" style="width: 0" /> <span>相邻房</span>
             </a-checkbox-group>
-            <a-textarea placeholder="还有什么能帮你" class="remark" v-if="isRemarked" :rows="3" maxlength="200" />
+            <!-- <a-checkbox value="extraRemark" style="width: 0" :defaultChecked="isRemarked" @change="remarkFunc" /> <span>备注</span> -->
+            <!-- <a-textarea placeholder="还有什么能帮你" v-model="extraRemark" class="remark" v-if="isRemarked" :rows="3" maxlength="256" /> -->
           </div>
         </div>
         <div class="section" style="border-bottom: 0">
           <div class="title">支付与优惠信息</div>
           <div class="radio-box">
             <label class="radio-left">支付方式</label>
-            <a-radio-group v-model="radioValue">
-              <a-radio :style="radioStyle" :value="1">门店现付</a-radio>
-              <a-radio :style="radioStyle" :value="2">支付全部房费</a-radio>
+            <a-radio-group v-model="payType">
+              <a-radio :style="radioStyle" value="CASH" disabled>门店现付</a-radio>
+              <a-radio :style="radioStyle" value="ONLINE">支付全部房费</a-radio>
             </a-radio-group>
           </div>
-          <div class="input-box" v-if="radioValue == 2">
+          <div class="input-box" v-if="payType == 'ONLINE'">
             <label>优惠券</label>
-            <a-select defaultValue="none" style="margin-left: 23px;">
+            <a-select disabled defaultValue="none" style="margin-left: 23px;">
               <a-select-option value="none">无可用优惠券</a-select-option>
             </a-select>
           </div>
@@ -110,26 +110,32 @@
           <div class="pic">
             <img src="@/assets/confirm-order-img-demo.jpg">
           </div>
-          <p class="title">锦江国际饭店</p>
-          <p class="address">地址：上海市黄浦区南京西路170号 </p>
+          <p class="title">{{ hotel.hname }}</p>
+          <p class="address">地址：{{ hotel.address }} </p>
         </div>
         <div class="section">
-          <div class="label">入住房型</div>
+          <div class="label">房间名称</div>
           <p>
-            标准大床房
-            <span>2间</span>
+            {{ room.rname }}
+            <span>{{ count }}间</span>
           </p>
-          <div class="label">价格名称</div>
-          <p>特惠房含单早</p>
+          <div class="label">入住房型</div>
+          <p>{{ room.type | roomTypeFilter }}</p>
           <div class="label">入住日期</div>
           <p>
-            2019-11-28 至 2019-11-30
-            <span>2晚</span>
+            {{ startTime.format('YYYY-MM-DD') }} 至 {{ endTime.format('YYYY-MM-DD') }}
+            <span>{{ endTime.date() - startTime.date() }}晚</span>
           </p>
           <div class="price-detail">
             <p>
+              房型单价：
+              <span>￥{{ room.price }}</span>
+            </p>
+          </div>
+          <div class="price-detail">
+            <p>
               房费小计：
-              <span>￥3600.00</span>
+              <span>￥{{ count * room.price * (endTime.date() - startTime.date()) }}</span>
             </p>
           </div>
         </div>
@@ -137,10 +143,10 @@
           <div class="price-total">
             总金额：
             <span>
-              ￥<b>3600</b>.00
+              ￥<b>{{ count * room.price * (endTime.date() - startTime.date()) }}</b>
             </span>
           </div>
-          <a-button class="order-btn" type="primary" :disabled="!isRead" @click="pay">提交订单</a-button>
+          <a-button class="order-btn" :loading="isLoading" type="primary" :disabled="!isRead" @click="pay">提交订单</a-button>
           <div class="protocol">
             <a-checkbox :defaultChecked="isRead" @change="readProtocl" value="1" style="width: 10px" /> 
             <span>已阅读并同意<a @click="showModal">《RoomsBooking酒店预订须知》</a></span>
@@ -278,13 +284,34 @@
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import Header from './Header'
 import Footer from './Footer'
-import moment from 'moment';
+import moment from 'moment'
+import { confirmOrder } from '@/api/order'
+
+const roomTypesMap = {
+  STANDARD: {
+    text: '标准房'
+  },
+  SUPERIOR: {
+    text: '高级房'
+  },
+  DELUXE: {
+    text: '豪华房'
+  },
+  BUSINESS: {
+    text: '商务房'
+  },
+}
 
 export default {
   name: 'ConfirmOrder',
   components: {
     'v-header': Header,
     'v-footer': Footer
+  },
+  filters: {
+    roomTypeFilter (type) {
+      return roomTypesMap[type].text
+    }
   },
   data () {
     return {
@@ -293,22 +320,47 @@ export default {
       userName1: null,
       userName2: null,
       isRemarked: false,
+      isLoading: false,
       radioStyle: {
         display: 'block',
         height: '30px',
         lineHeight: '30px',
       },
-      radioValue: 2,
-      isRead: true,
-      visible: false
+      isRead: false,
+      visible: false,
+      user: undefined,
+      hotel: undefined,
+      room: undefined,
+      startTime: undefined,
+      endTime: undefined,
+      checkInPerson: undefined,
+      telephone: undefined,
+      remark: '',
+      count: 1,
+      payType: 'ONLINE'
     };
+  },
+  created: function() {
+    this.getParams()
   },
   methods: {
     moment,
+    getParams: function() {
+      this.user = this.$route.params.user
+      this.hotel = this.$route.params.hotel
+      this.room = this.$route.params.room
+      this.startTime = this.$route.params.startTime
+      this.endTime = this.$route.params.endTime
+      this.checkInPerson = this.user.uname
+      this.telephone = this.user.telephone
+    },
     changeUser: function() {
       this.isChecked = !this.isChecked
     },
-    remark: function() {
+    handleChangeRemark: function(checkedValues) {
+      this.remark = checkedValues.join(",")
+    },
+    remarkFunc: function() {
       this.isRemarked = !this.isRemarked
     },
     readProtocl: function() {
@@ -321,7 +373,32 @@ export default {
       this.visible = false;
     },
     pay: function() {
-      this.$router.push('/pay')
+      let param = {
+        'startTime': this.startTime/*.format("YYYY-MM-DD HH:mm:ss")*/,
+        'endTime': this.endTime/*.format("YYYY-MM-DD HH:mm:ss")*/,
+        'count': this.count,
+        'checkInPerson': !this.isChecked && this.userName1 != null && this.userName2 != null ? this.userName1 + "," + this.userName2 : this.checkInPerson,
+        'telephone': this.telephone,
+        'remark': this.remark,
+        'payType': this.payType,
+        'rid': this.room.rid,
+        'totalPrice': this.count * this.room.price * (this.endTime.date() - this.startTime.date())
+      }
+      // console.log(param)
+      this.isLoading = true
+      confirmOrder({ ...param })
+        .then(res => {
+          if (res.success === true) {
+            console.log("预订成功，请付款")
+            this.isLoading = false
+            // this.$router.push('/pay')
+          } else {
+            this.$message.error(`预订失败: ${res.data}`)
+          }
+        })
+        .catch(err => {
+          this.$message.error(`预订异常: ${err.message}`)
+        })
     }
   }
 }

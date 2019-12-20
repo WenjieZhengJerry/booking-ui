@@ -25,7 +25,8 @@
           </a-form-item>
 
           <a-form-item label="入住人" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input v-decorator="['checkInPerson']" ></a-input>
+            <a-input v-decorator="['checkInPerson',
+            {rules: [{ required: true, message: '入住人不能为空' }]}]" ></a-input>
           </a-form-item>
 
           <a-form-item label="酒店" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -83,7 +84,7 @@
               showTime
               format="YYYY/MM/DD HH:mm:ss"
               placeholder="请选择入住时间"
-              v-decorator="['startTime']"
+              v-decorator="['startTime', {rules: [{ required: true, message: '入住时间不能为空' }]}]"
             />
           </a-form-item>
 
@@ -93,7 +94,7 @@
               showTime
               format="YYYY/MM/DD HH:mm:ss"
               placeholder="请选择离店时间"
-              v-decorator="['endTime']"
+              v-decorator="['endTime', {rules: [{ required: true, message: '离店时间不能为空' }]}]"
             />
           </a-form-item>
         </a-form>
