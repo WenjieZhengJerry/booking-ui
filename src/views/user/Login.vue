@@ -18,9 +18,9 @@
             <a-input
               v-decorator="[
                 'userName',
-                { rules: [{ required: true, message: '请输入账号' }] },
+                { rules: [{ required: true, message: '请输入邮箱' }] },
               ]"
-              placeholder="账号"
+              placeholder="邮箱"
             >
               <a-icon slot="prefix" type="user" style="color: rgba(0,0,0,.25)" />
             </a-input>
@@ -73,6 +73,8 @@
 <script>
 import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
+import {getPublicKey, login } from '@/api/login'
+import {rsaEncrypt, setLoginUid, login_uid } from '@/utils/encrypt'
 
 export default {
  name: 'Login',
@@ -90,13 +92,38 @@ export default {
   },
   methods: {
     handleSubmit(e) {
-      // e.preventDefault();
-      // this.form.validateFields((err, values) => {
-      //   if (!err) {
-      //     console.log('Received values of form: ', values);
-      //   }
-      // });
+      e.preventDefault();
+      this.form.validateFields((err, values) => {
+        if (!err) {
+          this.getKey(values.userName, values.password)
+        }
+      });
     },
+    getKey (email, password) {
+      return getPublicKey(email).then(res => {
+        if (res.success === true) {
+          password=rsaEncrypt(password, res.data)
+          this.submitInfo({email:email,upassword:password})
+        } else {
+          this.$notification.error({message: '登录失败'})
+        }
+      }).catch(ex => {
+        $message.error(`登录失败: ${err.message}`)
+      })
+    },
+    submitInfo (loginInfo) {
+      return login(loginInfo).then(res => {
+        if (res.success === true) {
+          setLoginUid(res.data)
+          this.$router.push({path:'/userCenter'})
+          this.$notification.success({message: '登录成功'})
+        } else {
+          this.$notification.error({message: '登录失败'})
+        }
+      }).catch(ex => {
+        $message.error(`登录失败: ${err.message}`)
+      })
+    }
   }
 }
 
