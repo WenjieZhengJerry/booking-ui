@@ -52,3 +52,11 @@ import {
       data: paramter
     })
   }
+
+  //付款
+  export function pay (id) {
+    return axios({
+      url: `${api.order}/pay/${id}`,
+      method: 'put'
+    })
+  }

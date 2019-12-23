@@ -98,7 +98,8 @@
       </a-row>
       <a-row>
         <a-col :span="24" :style="{ textAlign: 'right' }">
-          <a-popconfirm @confirm="DeleteIds()">
+          <span :style="{ cursor: 'pointer' }" @click="reload">刷新<a-icon type="reload" /></span>
+          <a-popconfirm @confirm="DeleteIds()" :style="{ marginLeft: '8px' }">
             <template slot="title">
               是否要删除所选？
             </template> 
@@ -306,6 +307,10 @@ export default {
     }
   },
   methods: {
+    //刷新
+    reload() {
+      this.$refs.table.refresh(true)
+    },
     //条件查询一页订单
     handleSearch(e) {
       e.preventDefault();

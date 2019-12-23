@@ -389,9 +389,19 @@ export default {
       confirmOrder({ ...param })
         .then(res => {
           if (res.success === true) {
-            console.log("预订成功，请付款")
+            // console.log("预订成功，请付款")
             this.isLoading = false
-            // this.$router.push('/pay')
+            this.$router.push({
+              name: 'Pay',
+              params: {
+                hotel: this.hotel,
+                roomType: this.$options.filters['roomTypeFilter'](this.room.type),
+                startTime: this.startTime.format("YYYY-MM-DD"),
+                endTime: this.endTime.format("YYYY-MM-DD"),
+                totalPrice: this.count * this.room.price * (this.endTime.date() - this.startTime.date()),
+                oid: res.data.oid
+              }
+            })
           } else {
             this.$message.error(`预订失败: ${res.data}`)
           }
