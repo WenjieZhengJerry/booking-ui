@@ -42,6 +42,7 @@
       :wrapper-col="{ span: 12 }"
       has-feedback
       :validate-status="validateSta.upassword"
+      :help="helpText.upassword"
       >
         <a-input
           v-decorator="[
@@ -78,25 +79,38 @@
         />
       </a-form-item>
       <a-form-item
-      label="电话号码"
+      label="验证码"
       :label-col="{ span: 5 }"
-      :wrapper-col="{ span: 12 }"
-      has-feedback
+      :wrapper-col="{ span: 10 }"
       >
-        <a-input
-          v-decorator="[
-            'captcha',
-            {rules: [{ required: true, message: '验证码!' },{ pattern: /^[0-9]{8}$/ , message: '电话格式不正确'}], validateTrigger: ['change', 'blur']}
-          ]"
-        />
-        <a-button type="primary">获取验证码</a-button>
+        <a-row>
+          <a-col class="gutter-row" :span="16">
+            <a-form-item
+              :wrapper-col="{ span: 20 }"
+              has-feedback
+              >
+              <a-input
+              type="text" 
+              placeholder="验证码" 
+              v-decorator="['captcha', {rules: [{ required: true, message: '请输入验证码' },{ validator: this.handleValidCaptcha }], validateTrigger: ['change', 'blur']}]"
+              />
+            </a-form-item>
+          </a-col>
+          <a-col class="gutter-row" :span="4">
+            <a-button 
+            type="primary" 
+            :disabled="getCaptchaStatus.isDisable" 
+            @click="getCaptcha">{{!getCaptchaStatus.isDisable && '获取验证码'||(getCaptchaStatus.time+' s')}}</a-button>
+          </a-col>
+        </a-row>
       </a-form-item>
-
     </a-form>
   </a-modal>
 </template>
 <script>
-
+import { getPublicKey, sendCaptcha, register } from '@/api/login'
+import { errorTipsMap } from '@/utils/errorTips'
+import { rsaEncrypt, registerUser } from '@/utils/encrypt'
 export default {
   name:'UserAdd',
   data() {
@@ -109,6 +123,26 @@ export default {
       validateSta:{
         upassword:'',
         confirm:''
+      },
+      disableGetCaptcha: false,
+      getCaptchaTest: '获取验证码',
+      captchaInfo:{
+        token:'',
+        code:''
+      },
+      getCaptchaStatus:{
+        time:60,
+        isDisable:false,
+        hideMessage:0
+      },
+      helpText:{
+        upassword:null
+      },
+      userInfo:{
+        email:'',
+        upassword:'',
+        telephone:'',
+        uname:''
       }
     }
   },
@@ -119,16 +153,26 @@ export default {
     },
     handleOk(e) {
       const { form: { validateFields } } = this;
-      this.form.validateFields((errors, values) => {
+      this.form.validateFields({ force: true }, (errors, values) => {
         if (errors) {
+          console.log('UserAdd.form.validateFields',errors)
           return
         }
-        alert(values.uname)
-        alert(values.upassword)
-        alert(values.confirmUpassword)
-        alert(values.email)
-        alert(values.telephone)
-        this.confirmLoading = true;
+        this.userInfo.email=values.email
+        this.userInfo.upassword=values.upassword
+        this.userInfo.uname=values.uname
+        this.userInfo.telephone=values.telephone
+        this.confirmLoading = true
+        registerUser(this.userInfo,this.captchaInfo,(status,tips)=>{
+          this.confirmLoading = false
+          if(0===status){
+            this.$notification.success({message: tips})
+          }
+          else{
+            this.$notification.error({message: tips})
+            console.log(tips)
+          }
+        })
       });
     },
     handleCancel(e) {
@@ -136,19 +180,21 @@ export default {
     },
     handleValidUpassword (rule, value, callback) {
       let tips='密码长度要在6~18之间'
+      this.helpText.upassword=null
       //长度要在6~18之间
       if(/\S{6,18}$/.test(value)){
         //只能以字母开头的数字大小写字母
         if (/^[a-zA-Z][a-zA-Z0-9]/.test(value)) {
           // 特殊字符
           if (/[^\w\s]+/.test(value)) {
-             this.validateSta.upassword='success'
-            tips='密码强度: 强'
+            this.validateSta.upassword='success'
+            this.helpText.upassword='密码强度: 强'
           }
           else{
             this.validateSta.upassword='warning'
-            tips='密码强度: 弱'
+            this.helpText.upassword='密码强度: 弱'
           }
+          callback()
         }
         else{
           this.validateSta.upassword='error'
@@ -166,32 +212,55 @@ export default {
         this.validateSta.confirm='error'
         callback('输入密码不一致!');
       } else {
+        this.validateSta.confirm='success'
         callback();
       }
     },
-    getKey (email, password) {
-      return getPublicKey(email).then(res => {
-        if (res.success === true) {
-          this.userInfo.upassword=rsaEncrypt(password, res.data)
-          this.submitInfo(this.userInfo,this.captchaInfo)
-          return
-        }
-          this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
-      }).catch(ex => {
-        this.requestFailed(ex)
-      })
+    handleValidCaptcha(rule, value, callback){
+      if (undefined===value) {
+        callback(new Error('请输入验证码'))
+      }
+      if(4!=value.length){
+        callback(new Error('请输入4位验证码'))
+      }
+      if(value!==this.captchaInfo.code){
+        callback(new Error('验证码不正确'))
+      }
+      callback()
     },
-    submitInfo (info,token) {
-      register(info,token).then(res => {
-        if (res.success === true) {
-          this.$notification.success({message: '注册成功'})
-          this.$router.push({path:'/login'})
+    getCaptcha(){
+      const { form: { validateFields }, $message} = this;
+      this.form.validateFields(['email'],(errors, values) => {
+        if (errors) {
           return
         }
-        this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
-      }).catch(ex => {
-        this.requestFailed(ex)
-      })
+        this.getCaptchaStatus.isDisable = true
+        const interval = window.setInterval(() => {
+          if (this.getCaptchaStatus.time-- <= 0) {
+            this.getCaptchaStatus.time = 60
+            this.getCaptchaStatus.isDisable = false
+            window.clearInterval(interval)
+          }
+        }, 1000)
+
+        this.hideMessage = $message.loading('验证码发送中..', 0)
+
+        sendCaptcha(values.email).then(res => {
+          setTimeout(this.hideMessage)
+          if (res.success === true) {
+            this.captchaInfo.token=res.data.token
+            this.captchaInfo.code=res.data.code
+            alert(res.data.code)
+            this.$notification.success({message: '验证码已发送'})
+            return
+          }
+          this.$notification.error({message: `验证码发送失败: ${errorTipsMap[res.data]}`})
+        }).catch(ex => {
+          setTimeout(this.hideMessage)
+          this.$notification.error({message: '请求出现错误，请稍后再试'})
+          console.log('请求出现错误，请稍后再试',ex.message)
+        })
+      });
     }
   }
 }

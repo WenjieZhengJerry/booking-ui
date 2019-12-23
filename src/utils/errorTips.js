@@ -6,6 +6,7 @@ export const errorTipsMap={
     'user_existed':'用户已存在',
     'captcha_error':'验证码错误',
     'captcha_expired':'验证码过期',
-    'password_error':'密码错误'
+    'password_error':'密码错误',
+    'empty_info':'账号或密码为空'
 }
 

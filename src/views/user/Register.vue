@@ -83,7 +83,7 @@ import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
 import { mixinDevice } from '@/utils/mixin.js'
 import { getPublicKey, sendCaptcha, register } from '@/api/login'
-import { rsaEncrypt } from '@/utils/encrypt'
+import { rsaEncrypt, registerUser } from '@/utils/encrypt'
 import { errorTipsMap } from '@/utils/errorTips'
 
 const levelNames = {
@@ -197,34 +197,46 @@ export default {
         if (!err) {
           this.captchaInfo.code=values.captcha
           this.userInfo.email=values.email
-          this.getKey (values.email, values.password)
+          this.userInfo.upassword=values.upassword
+          registerUser(this.userInfo,this.captchaInfo,(status,tips)=>{
+            // this.confirmLoading = false
+            if(0===status){
+              this.$notification.success({message: tips})
+              this.$router.push({path:'/login'})
+            }
+            else{
+              this.$notification.error({message: tips})
+              console.log(tips)
+            }
+          })
+          //this.getKey (values.email, values.password)
         }
       })
     },
-    getKey (email, password) {
-      return getPublicKey(email).then(res => {
-        if (res.success === true) {
-          this.userInfo.upassword=rsaEncrypt(password, res.data)
-          this.submitInfo(this.userInfo,this.captchaInfo)
-          return
-        }
-          this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
-      }).catch(ex => {
-        this.requestFailed(ex)
-      })
-    },
-    submitInfo (info,token) {
-      register(info,token).then(res => {
-        if (res.success === true) {
-          this.$notification.success({message: '注册成功'})
-          this.$router.push({path:'/login'})
-          return
-        }
-        this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
-      }).catch(ex => {
-        this.requestFailed(ex)
-      })
-    },
+    // getKey (email, password) {
+    //   return getPublicKey(email).then(res => {
+    //     if (res.success === true) {
+    //       this.userInfo.upassword=rsaEncrypt(password, res.data)
+    //       this.submitInfo(this.userInfo,this.captchaInfo)
+    //       return
+    //     }
+    //       this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
+    //   }).catch(ex => {
+    //     this.requestFailed(ex)
+    //   })
+    // },
+    // submitInfo (info,token) {
+    //   register(info,token).then(res => {
+    //     if (res.success === true) {
+    //       this.$notification.success({message: '注册成功'})
+    //       this.$router.push({path:'/login'})
+    //       return
+    //     }
+    //     this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
+    //   }).catch(ex => {
+    //     this.requestFailed(ex)
+    //   })
+    // },
     getCaptcha (e) {
       e.preventDefault()
       const { form: { validateFields }, state, $message, $notification } = this
