@@ -75,6 +75,7 @@ import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
 import {getPublicKey, login } from '@/api/login'
 import {rsaEncrypt, setLoginUid, login_uid } from '@/utils/encrypt'
+import {errorTipsMap } from '@/utils/errorTips'
 
 export default {
  name: 'Login',
@@ -104,11 +105,12 @@ export default {
         if (res.success === true) {
           password=rsaEncrypt(password, res.data)
           this.submitInfo({email:email,upassword:password})
-        } else {
-          this.$notification.error({message: '登录失败'})
+          return
         }
+        this.$notification.error({message: `登录失败: ${errorTipsMap[res.data]}`})
       }).catch(ex => {
-        $message.error(`登录失败: ${err.message}`)
+          this.$notification.error({message: '请求出现错误，请稍后再试'})
+          console.log('请求出现错误，请稍后再试',ex.message)
       })
     },
     submitInfo (loginInfo) {
@@ -117,11 +119,12 @@ export default {
           setLoginUid(res.data)
           this.$router.push({path:'/userCenter'})
           this.$notification.success({message: '登录成功'})
-        } else {
-          this.$notification.error({message: '登录失败'})
+          return
         }
+        this.$notification.error({message: `登录失败: ${errorTipsMap[res.data]}`})
       }).catch(ex => {
-        $message.error(`登录失败: ${err.message}`)
+          this.$notification.error({message: '请求出现错误，请稍后再试'})
+          console.log('请求出现错误，请稍后再试',ex.message)
       })
     }
   }

@@ -2,51 +2,26 @@
 <template>
   <div>
     <a-card :busered="false" :bordered="false">
-      <div class="table-page-search-wrapper">
-        <a-form layout="inline">
-          <a-row :gutter="0">
-            <a-col style="float:left">
-              <a-form-item label="用户名">
-                <a-input v-model="queryParam.uname" placeholder="请输入用户名" />
-              </a-form-item>
-            </a-col>
-            <a-col style="float:left">
-              <a-form-item label="用户类型">
-                <a-select defaultValue="null" v-model="queryParam.type" style="width: 100px">
-                  <a-select-option value="null">不限</a-select-option>
-                  <a-select-option value="0">普通用户</a-select-option>
-                  <a-select-option value="1">管理员</a-select-option>
-                </a-select>
-              </a-form-item>
-              <a-form-item label="用户状态">
-                <a-select defaultValue="null" v-model="queryParam.enable" style="width: 80px">
-                  <a-select-option value="null">不限</a-select-option>
-                  <a-select-option value="true">启用</a-select-option>
-                  <a-select-option value="false">停用</a-select-option>
-                </a-select>
-              </a-form-item>
-            </a-col>
-            <a-col>
-              <a-form-item label="">
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-                <a-button style="margin-left: 8px" @click="resetSearchForm">重置</a-button>
-              </a-form-item>
-            </a-col>
-            <a-col style="float:left;margin-top:20px;margin-bottom:-20px;">
-              <a-dropdown>
-                <a-menu slot="overlay" @click="handleMenuBatchClick">
-                  <a-menu-item key="enable"><a-icon type="unlock" theme="twoTone" twoToneColor="#00ffff"/>启用</a-menu-item>
-                  <a-menu-item key="disable"><a-icon type="lock" theme="twoTone" twoToneColor="#ffc0cb"/>停用</a-menu-item>
-                  <a-menu-item key="delete"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/>删除</a-menu-item>
-                </a-menu>
-                <a-button type="primary">
-                  批处理 <a-icon type="down" />
-                </a-button>
-              </a-dropdown>
-            </a-col>
-          </a-row>
-        </a-form>
-      </div>
+      <a-row :gutter="0">
+        <a-col style="float:left;margin-top:20px;margin-bottom:-20px;">
+          <a-dropdown>
+            <a-menu slot="overlay" @click="handleMenuBatchClick">
+              <a-menu-item key="enable"><a-icon type="unlock" theme="twoTone" twoToneColor="#00ffff"/>启用</a-menu-item>
+              <a-menu-item key="disable"><a-icon type="lock" theme="twoTone" twoToneColor="#ffc0cb"/>停用</a-menu-item>
+              <a-menu-item key="delete"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/>删除</a-menu-item>
+            </a-menu>
+            <a-button type="primary">
+             <a-icon type="ordered-list" /> 批处理 <a-icon type="down" />
+            </a-button>
+          </a-dropdown>
+        </a-col>
+        <a-col style="float:left;margin-top:20px;margin-bottom:-20px;margin-left:10px">
+          <a-button type="primary" @click="handleSearch"><a-icon type="search" />查询</a-button>
+        </a-col>
+        <a-col style="float:left;margin-top:20px;margin-bottom:-20px;margin-left:10px">
+          <a-button type="primary" @click="handleAdd"><a-icon type="plus" />添加管理员</a-button>
+        </a-col>
+      </a-row>
     </a-card>
     <!--
     rowKey:必须使用唯一标识的字段
@@ -89,7 +64,9 @@
           <template>
             <a @click="handleCheck(record)" title="查看用户信息"><a-icon type="user" /></a>
             <a-divider type="vertical" />
-            <a @click="handleDelete(record.uid)" title="删除用户"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/></a>
+              <a-popconfirm title="确认要删除该用户吗?" @confirm="handleDelete(record.uid)" cancelText="不要" okText="是的">
+              <a title="删除用户"><a-icon type="delete" theme="twoTone" twoToneColor="#ff0000"/></a>
+            </a-popconfirm>
             <!--
             <a-divider type="vertical" />
             <a @click="handleDelete(record.uid)"><a-icon type="ordered-list"/></a>
@@ -97,7 +74,9 @@
            </template>
         </span>
       </s-table>
-      <user-check ref="modal" />
+      <user-check ref="checkModal"/>
+      <user-search ref="searchModel" @search="searchUser" />
+      <user-add ref="addModel" @add="addUser" />
     </a-card>
   </div>
 </template>
@@ -107,9 +86,12 @@
 // 例如：import 《组件名称》 from '《组件路径》';
 import STable from '@/components/Table'
 import Ellipsis from '@/components/Ellipsis'
+import UserCheck from './form/UserCheck'
+import UserSearch from './form/UserSearch'
+import UserAdd from './form/UserAdd'
 import { getUsers, deleteUser, deleteUserBatch, updateUser, updateUserBatch } from '@/api/user'
 import { parsePage } from '@/utils/pageable'
-import UserCheck from './form/UserCheck'
+import {errorTipsMap } from '@/utils/errorTips'
 const userTypeMap = {
   '0': {
     type: 'warning',
@@ -128,60 +110,61 @@ export default {
   components: {
     STable,
     Ellipsis,
-    UserCheck
+    UserCheck,
+    UserSearch,
+    UserAdd
   },
   data () {
     // 这里存放数据
     return {
       // 查询条件
-      queryParam: {
-        uname:null,
-        type:'null',
-        enable:'null',
-      },
-      queryParamBack: {},
+      queryParams: { },
       columns: [
         {
           title: '用户id',
+          width: '10%',
           dataIndex: 'uid'
         },
         {
           title: '用户名',
           dataIndex: 'uname',
+          width: '16%',
           scopedSlots: { customRender: 'name' }
         },
         {
           title: '邮箱',
+          width: '16%',
           dataIndex: 'email'
         },
         {
           title: '电话',
+          width: '14%',
           dataIndex: 'telephone',
         },
         {
           title: '类型',
           dataIndex: 'type',
+          width: '14%',
           scopedSlots: { customRender: 'type' }
         },
         {
           title: '状态',
           dataIndex: 'enable',
+          width: '14%',
           scopedSlots: { customRender: 'status' },
         },
         {
           title: '查看/操作',
           dataIndex: 'check',
-          width: '100px',
+          width: '14%',
           scopedSlots: { customRender: 'check' }
         }
       ],
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
         console.log('loadData.parameter', parameter)
-        this.queryParamBack.uname=this.queryParam.uname;
-        this.queryParamBack.type='null'===this.queryParam.type?null:this.queryParam.type;
-        this.queryParamBack.enable='null'===this.queryParam.enable?null:this.queryParam.enable;
-        return getUsers({ ...parameter, ...this.queryParamBack }).then(res => {
+        console.log('loadData.queryParams', this.queryParams)
+        return getUsers({ ...parameter, ...this.queryParams }).then(res => {
           if (res.success === true) {
             return { ...parsePage(res) }
           } else {
@@ -219,12 +202,26 @@ export default {
   },
   // 方法集合
   methods: {
-    handleCheck (record) {
-      this.$refs.modal.data=record
-      this.$refs.modal.show(record)
+    handleCheck (record) { // 点击查看用户信息
+      this.$refs.checkModal.show(record)
     },
-    handleOk () {
-      this.$refs.table.refresh()
+    handleSearch () { // 显示搜索框
+      this.$refs.searchModel.show()
+    },
+    handleAdd(){
+      this.$refs.addModel.show()
+    },
+    searchUser(params){ // 点击搜索事件
+      this.queryParams.uname=0>=params.uname.length?null:params.uname;
+      this.queryParams.email=0>=params.email?null:params.email;
+      this.queryParams.telephone=0>=params.telephone?null:params.telephone;
+      this.queryParams.type='null'===params.type?null:params.type;
+      this.queryParams.enable='null'===params.enable?null:params.enable;
+      this.$refs.table.refresh(true)
+      this.$refs.searchModel.hide()
+    },
+    addUser(){
+
     },
     handleDelete (recordId) {
       console.log(recordId)
@@ -232,11 +229,14 @@ export default {
         if (res.success === true) {
           this.$notification.success({message: '删除成功'})
           this.$refs.table.refresh(true)
+          return
         }
+        this.$notification.error({message: `删除失败: ${errorTipsMap[res.data]}`})
       })
-        .catch(err => {
-          $message.error(`删除失败: ${err.message}`)
-        })
+      .catch(ex => {
+        this.$notification.error({message: '请求出现错误，请稍后再试'})
+        console.log('请求出现错误，请稍后再试',ex.message)
+      })
     },
     changeStatus (newEnable, record) {
       record.enable=newEnable
@@ -244,11 +244,14 @@ export default {
         if (res.success === true) {
           this.$notification.success({message: '更新成功'})
           this.$refs.table.refresh(true)
+          return
         }
+        this.$notification.error({message: `更新失败: ${errorTipsMap[res.data]}`})
       })
-        .catch(err => {
-          $message.error(`更新失败: ${err.message}`)
-        })
+      .catch(ex => {
+        this.$notification.error({message: '请求出现错误，请稍后再试'})
+        console.log('请求出现错误，请稍后再试',ex.message)
+      })
     },
     handleMenuBatchClick (menu) {
       if (this.selectedRowKeys.length < 1) {
@@ -262,7 +265,7 @@ export default {
         this.changeStatusBatch(false,this.selectedRows);
       }
       else if("delete"===menu.key){
-        this.handleDeleteBatch();
+        this.showDeleteBatchConfirm(this.handleDeleteBatch);
       }
     },
     changeStatusBatch (newEnable, records) {
@@ -273,11 +276,27 @@ export default {
         if (res.success === true) {
           this.$notification.success({message: '更新成功'})
           this.$refs.table.refresh(true)
+          return
         }
+        this.$notification.error({message: `更新失败: ${errorTipsMap[res.data]}`})
       })
-        .catch(err => {
-          $message.error(`更新失败: ${err.message}`)
-        })
+      .catch(ex => {
+        this.$notification.error({message: '请求出现错误，请稍后再试'})
+        console.log('请求出现错误，请稍后再试',ex.message)
+      })
+    },
+    showDeleteBatchConfirm (callback){
+      this.$confirm({
+        title: '确认要删除这些用户吗?',
+        content: '',
+        okText: '是的',
+        okType: 'danger',
+        cancelText: '不要',
+        onOk() {
+          callback()
+        },
+        onCancel() {},
+      });
     },
     handleDeleteBatch () {
       deleteUserBatch(this.selectedRowKeys).then(res => {
@@ -285,11 +304,14 @@ export default {
           this.selectedRowKeys=[]
           this.$notification.success({message: '删除成功'})
           this.$refs.table.refresh(true)
+          return
         }
+        this.$notification.error({message: `更新失败: ${errorTipsMap[res.data]}`})
       })
-        .catch(err => {
-          $message.error(`删除失败: ${err.message}`)
-        })
+      .catch(ex => {
+        this.$notification.error({message: '请求出现错误，请稍后再试'})
+        console.log('请求出现错误，请稍后再试',ex.message)
+      })
     },
     // 时间区间日历组件发送改变时 重新生成查询条件
     onChange (dates, dateStrings) {

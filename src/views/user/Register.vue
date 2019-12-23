@@ -84,6 +84,7 @@ import Footer from '@/views/user/Footer'
 import { mixinDevice } from '@/utils/mixin.js'
 import { getPublicKey, sendCaptcha, register } from '@/api/login'
 import { rsaEncrypt } from '@/utils/encrypt'
+import { errorTipsMap } from '@/utils/errorTips'
 
 const levelNames = {
   0: '低',
@@ -180,15 +181,12 @@ export default {
     handleCaptchaCheck (rule, value, callback) {
       if (undefined===value) {
         callback(new Error('请输入验证码'))
-        return
       }
       if(4!=value.length){
         callback(new Error('请输入4位验证码'))
-        return
       }
       if(value!==this.captchaInfo.code){
         callback(new Error('验证码不正确'))
-        return
       }
       callback()
     },
@@ -207,24 +205,24 @@ export default {
       return getPublicKey(email).then(res => {
         if (res.success === true) {
           this.userInfo.upassword=rsaEncrypt(password, res.data)
-          this.submitInfo({...this.userInfo,...this.captchaInfo})
-        } else {
-          this.$notification.error({message: '注册失败'})
+          this.submitInfo(this.userInfo,this.captchaInfo)
+          return
         }
+          this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
       }).catch(ex => {
-        $message.error(`注册失败: ${err.message}`)
+        this.requestFailed(ex)
       })
     },
-    submitInfo (info) {
-      register(info).then(res => {
+    submitInfo (info,token) {
+      register(info,token).then(res => {
         if (res.success === true) {
           this.$notification.success({message: '注册成功'})
           this.$router.push({path:'/login'})
-        } else {
-          this.$notification.error({message: '注册失败'})
+          return
         }
+        this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
       }).catch(ex => {
-        $message.error(`注册失败: ${err.message}`)
+        this.requestFailed(ex)
       })
     },
     getCaptcha (e) {
@@ -246,21 +244,6 @@ export default {
 
             this.hide = $message.loading('验证码发送中..', 0)
             this.send(values.email)
-
-            // getSmsCaptcha({ mobile: values.mobile }).then(res => {
-            //   setTimeout(hide, 2500)
-            //   $notification['success']({
-            //     message: '提示',
-            //     description: '验证码获取成功，您的验证码为：' + res.result.captcha,
-            //     duration: 8
-            //   })
-            // }).catch(err => {
-            //   setTimeout(hide, 1)
-            //   clearInterval(interval)
-            //   state.time = 60
-            //   state.smsSendBtn = false
-            //   this.requestFailed(err)
-            // })
           }
         }
       )
@@ -273,11 +256,11 @@ export default {
           this.captchaInfo.code=res.data.code
           alert(res.data.code)
           this.$notification.success({message: '验证码已发送'})
-        } else {
-          this.$notification.error({message: '验证码发送失败'})
+          return
         }
+        this.$notification.error({message: `验证码发送失败: ${errorTipsMap[res.data]}`})
       }).catch(ex => {
-        $message.error(`验证码发送失败: ${err.message}`)
+        this.requestFailed(ex)
       })
     },
     requestFailed (err) {
@@ -286,7 +269,7 @@ export default {
         description: ((err.response || {}).data || {}).message || '请求出现错误，请稍后再试',
         duration: 4
       })
-      this.registerBtn = false
+      this.registerBtn = true
     }
   }
 }
