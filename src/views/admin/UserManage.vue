@@ -1,5 +1,6 @@
 <!--  -->
 <template>
+<a-locale-provider :locale="zh_CN">
   <div>
     <a-card :busered="false" :bordered="false">
       <a-row :gutter="0">
@@ -79,11 +80,13 @@
       <user-add ref="addModel" @add="addUser" />
     </a-card>
   </div>
+</a-locale-provider>
 </template>
 
 <script>
 // 这里可以导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
 // 例如：import 《组件名称》 from '《组件路径》';
+import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import STable from '@/components/Table'
 import Ellipsis from '@/components/Ellipsis'
 import UserCheck from './form/UserCheck'
@@ -117,6 +120,7 @@ export default {
   data () {
     // 这里存放数据
     return {
+      zh_CN,
       // 查询条件
       queryParams: { },
       columns: [
