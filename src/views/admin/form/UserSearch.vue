@@ -4,7 +4,6 @@
     cancelText="取消"
     okText="搜索"
     :visible="visible"
-    :destroyOnClose="destroyOnClose"
     @ok="$emit('search',searchParams)"
     :confirmLoading="confirmLoading"
     @cancel="handleCancel"
@@ -52,7 +51,6 @@ export default {
       ModalText: 'Content of the modal',
       visible: false,
       confirmLoading: false,
-      destroyOnClose: true,
       searchParams:{
         uname:'',
         email:'',
@@ -66,8 +64,16 @@ export default {
     show() {
       this.visible = true
     },
+    init(){
+      this.searchParams.uname=''
+      this.searchParams.email=''
+      this.searchParams.telephone=''
+      this.searchParams.type='null'
+      this.searchParams.enable='null'
+    },
     hide(){
-        this.visible = false
+      this.init()
+      this.visible = false
     },
     //handleOk(e) {
     //   this.ModalText = 'The modal will be closed after two seconds';
@@ -78,7 +84,8 @@ export default {
     //   }, 2000);
     //},
     handleCancel(e) {
-        this.visible = false
+      this.init()
+      this.visible = false
     },
   }
 }

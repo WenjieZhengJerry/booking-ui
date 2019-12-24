@@ -225,7 +225,8 @@ export default {
       this.$refs.searchModel.hide()
     },
     addUser(){
-
+      this.$refs.addModel.hide()
+      this.$refs.table.refresh(true)
     },
     handleDelete (recordId) {
       console.log(recordId)

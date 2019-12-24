@@ -45,10 +45,11 @@
       :help="helpText.upassword"
       >
         <a-input
-          v-decorator="[
-            'upassword',
-            {rules: [{ required: true, message: '请输入密码!' },{ validator: this.handleValidUpassword }], validateTrigger: ['change', 'blur']}
-          ]"
+        type="password"
+        v-decorator="[
+          'upassword',
+          {rules: [{ required: true, message: '请输入密码!' },{ validator: this.handleValidUpassword }], validateTrigger: ['change', 'blur']}
+        ]"
         />
       </a-form-item>
      <a-form-item
@@ -59,10 +60,11 @@
       :validate-status="validateSta.confirm"
       >
         <a-input
-          v-decorator="[
-            'confirm',
-            {rules: [{ required: true, message: '请输入确认密码!' },{ validator: this.handleValidConfirm }], validateTrigger: ['change', 'blur']}
-          ]"
+        type="password"
+        v-decorator="[
+          'confirm',
+          {rules: [{ required: true, message: '请输入确认密码!' },{ validator: this.handleValidConfirm }], validateTrigger: ['change', 'blur']}
+        ]"
         />
       </a-form-item>
       <a-form-item
@@ -92,7 +94,7 @@
               <a-input
               type="text" 
               placeholder="验证码" 
-              v-decorator="['captcha', {rules: [{ required: true, message: '请输入验证码' },{ validator: this.handleValidCaptcha }], validateTrigger: ['change', 'blur']}]"
+              v-decorator="['captcha', {rules: [{ required: true, message: ' ' },{ validator: this.handleValidCaptcha }], validateTrigger: ['change', 'blur']}]"
               />
             </a-form-item>
           </a-col>
@@ -151,6 +153,23 @@ export default {
         this.visible = true
         this.confirmLoading = false;
     },
+    hide(){
+      this.visible = false
+    },
+    init(){
+      this.userInfo.email=''
+      this.userInfo.upassword=''
+      this.userInfo.telephone=''
+      this.userInfo.uname=''
+      this.captchaInfo.token=''
+      this.captchaInfo.code=''
+      this.disableGetCaptcha=false
+      this.validateSta.upassword=null
+      this.validateSta.confirm=null
+      this.helpText.upassword=null
+      this.form.resetFields()
+    },
+    notificationParent(){this.$emit('add',true)},
     handleOk(e) {
       const { form: { validateFields } } = this;
       this.form.validateFields({ force: true }, (errors, values) => {
@@ -166,7 +185,10 @@ export default {
         registerUser(this.userInfo,this.captchaInfo,(status,tips)=>{
           this.confirmLoading = false
           if(0===status){
+            const interval = window.setInterval(() => {window.clearInterval(interval)}, 500)
             this.$notification.success({message: tips})
+            this.init()
+            this.notificationParent()
           }
           else{
             this.$notification.error({message: tips})
@@ -179,8 +201,6 @@ export default {
       this.visible = false
     },
     handleValidUpassword (rule, value, callback) {
-      let tips='密码长度要在6~18之间'
-      this.helpText.upassword=null
       //长度要在6~18之间
       if(/\S{6,18}$/.test(value)){
         //只能以字母开头的数字大小写字母
@@ -198,17 +218,18 @@ export default {
         }
         else{
           this.validateSta.upassword='error'
-          tips='请输入字母开头的密码'
+          this.helpText.upassword='请输入字母开头的密码'
+          callback('请输入字母开头的密码')
         }
       }
       else{
         this.validateSta.upassword='error'
+        this.helpText.upassword='密码长度要在6~18之间'
+        callback('密码长度要在6~18之间')
       }
-      callback(tips)
     }, 
     handleValidConfirm (rule, value, callback) {
-      const form = this.form;
-      if (value && value !== form.getFieldValue('upassword')) {
+      if (value && value !== this.form.getFieldValue('upassword')) {
         this.validateSta.confirm='error'
         callback('输入密码不一致!');
       } else {
@@ -218,13 +239,13 @@ export default {
     },
     handleValidCaptcha(rule, value, callback){
       if (undefined===value) {
-        callback(new Error('请输入验证码'))
+        callback('请输入验证码')
       }
       if(4!=value.length){
-        callback(new Error('请输入4位验证码'))
+        callback('请输入4位验证码')
       }
       if(value!==this.captchaInfo.code){
-        callback(new Error('验证码不正确'))
+        callback('验证码不正确')
       }
       callback()
     },
