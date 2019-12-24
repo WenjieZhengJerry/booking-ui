@@ -16,6 +16,16 @@
     >
       <a-spin :spinning="confirmLoading">
         <a-form :form="form">
+          <a-form-item label="下单时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-date-picker
+              style="width: 100%"
+              showTime
+              format="YYYY/MM/DD HH:mm:ss"
+              v-decorator="['createTime']"
+              disabled
+            />
+          </a-form-item>
+
           <a-form-item label="下单人" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-input v-decorator="['user.uname']" :disabled="true"></a-input>
           </a-form-item>
@@ -38,12 +48,12 @@
           </a-form-item>
 
           <a-form-item label="单价" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input-number v-model="price" @change="handlePrice" placeholder="单价" ></a-input-number>
+            <a-input-number v-model="price" @change="handleChange" placeholder="单价" ></a-input-number>
             &nbsp;元
           </a-form-item>
 
           <a-form-item label="数量" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-select v-model="count" placeholder="请选择" @change="handleCount">
+            <a-select v-model="count" placeholder="请选择" @change="handleChange">
               <a-select-option value="1">1</a-select-option>
               <a-select-option value="2">2</a-select-option>
               <a-select-option value="3">3</a-select-option>
@@ -53,6 +63,28 @@
           <a-form-item label="总价" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-input-number placeholder="总价" v-model="totalPrice"></a-input-number>
             &nbsp;元
+          </a-form-item>
+
+          <a-form-item label="入住时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-date-picker
+              @change="changeStartTime"
+              style="width: 100%"
+              showTime
+              format="YYYY/MM/DD HH:mm:ss"
+              placeholder="请选择入住时间"
+              v-decorator="['startTime', {rules: [{ required: true, message: '入住时间不能为空' }]}]"
+            />
+          </a-form-item>
+
+          <a-form-item label="离店时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-date-picker
+              @change="changeEndTime"
+              style="width: 100%"
+              showTime
+              format="YYYY/MM/DD HH:mm:ss"
+              placeholder="请选择离店时间"
+              v-decorator="['endTime', {rules: [{ required: true, message: '离店时间不能为空' }]}]"
+            />
           </a-form-item>
 
           <a-form-item label="订单状态" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -66,36 +98,6 @@
 
           <a-form-item label="订单备注" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-input v-decorator="['remark']" ></a-input>
-          </a-form-item>
-
-          <a-form-item label="下单时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-date-picker
-              style="width: 100%"
-              showTime
-              format="YYYY/MM/DD HH:mm:ss"
-              v-decorator="['createTime']"
-              disabled
-            />
-          </a-form-item>
-
-          <a-form-item label="入住时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-date-picker
-              style="width: 100%"
-              showTime
-              format="YYYY/MM/DD HH:mm:ss"
-              placeholder="请选择入住时间"
-              v-decorator="['startTime', {rules: [{ required: true, message: '入住时间不能为空' }]}]"
-            />
-          </a-form-item>
-
-          <a-form-item label="离店时间" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-date-picker
-              style="width: 100%"
-              showTime
-              format="YYYY/MM/DD HH:mm:ss"
-              placeholder="请选择离店时间"
-              v-decorator="['endTime', {rules: [{ required: true, message: '离店时间不能为空' }]}]"
-            />
           </a-form-item>
         </a-form>
       </a-spin>
@@ -209,11 +211,20 @@ export default {
     handleCancel() {
       this.visible = false
     },
-    handlePrice() {
-      this.totalPrice = Math.ceil(this.price * this.count)
+    handleChange() {
+      let startTime = this.form.getFieldValue("startTime")
+      let endTime = this.form.getFieldValue("endTime")
+      this.totalPrice = Math.ceil(this.price * this.count * (endTime.date() - startTime.date()))
     },
-    handleCount() {
-      this.totalPrice = Math.ceil(this.price * this.count)
+    changeStartTime(date) {
+      let startTime = date
+      let endTime = this.form.getFieldValue("endTime")
+      this.totalPrice = Math.ceil(this.price * this.count * (endTime.date() - startTime.date()))
+    },
+    changeEndTime(date) {
+      let startTime = this.form.getFieldValue("startTime")
+      let endTime = date
+      this.totalPrice = Math.ceil(this.price * this.count * (endTime.date() - startTime.date()))
     }
   }
 }

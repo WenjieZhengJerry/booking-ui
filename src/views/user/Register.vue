@@ -39,20 +39,21 @@
           </a-form-item>
 
           <a-row :gutter="16">
-            <a-col class="gutter-row" :span="16">
+            <a-col class="gutter-row" :span="14">
               <a-form-item>
                 <a-input size="large" type="text" placeholder="验证码" v-decorator="['captcha', {rules: [{ required: true, message: '请输入验证码' }, { validator: this.handleCaptchaCheck }], validateTrigger: ['change', 'blur']}]">
                   <a-icon slot="prefix" type="mail" :style="{ color: 'rgba(0,0,0,.25)' }"/>
                 </a-input>
               </a-form-item>
             </a-col>
-            <a-col class="gutter-row" :span="8">
+            <a-col class="gutter-row" :span="10">
               <a-button
-                class="getCaptcha"
-                size="large"
-                :disabled="state.smsSendBtn"
-                @click.stop.prevent="getCaptcha"
-                v-text="!state.smsSendBtn && '获取验证码'||(state.time+' s')"></a-button>
+              type="primary" 
+              class="getCaptcha"
+              size="large"
+              :disabled="state.smsSendBtn"
+              @click.stop.prevent="getCaptcha"
+              v-text="!state.smsSendBtn && '获取验证码'||(state.time+' s')"></a-button>
             </a-col>
           </a-row>
 
@@ -83,7 +84,8 @@ import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
 import { mixinDevice } from '@/utils/mixin.js'
 import { getPublicKey, sendCaptcha, register } from '@/api/login'
-import { rsaEncrypt } from '@/utils/encrypt'
+import { rsaEncrypt, registerUser } from '@/utils/encrypt'
+import { errorTipsMap } from '@/utils/errorTips'
 
 const levelNames = {
   0: '低',
@@ -180,15 +182,12 @@ export default {
     handleCaptchaCheck (rule, value, callback) {
       if (undefined===value) {
         callback(new Error('请输入验证码'))
-        return
       }
       if(4!=value.length){
         callback(new Error('请输入4位验证码'))
-        return
       }
       if(value!==this.captchaInfo.code){
         callback(new Error('验证码不正确'))
-        return
       }
       callback()
     },
@@ -199,34 +198,46 @@ export default {
         if (!err) {
           this.captchaInfo.code=values.captcha
           this.userInfo.email=values.email
-          this.getKey (values.email, values.password)
+          this.userInfo.upassword=values.password
+          registerUser(this.userInfo,this.captchaInfo,(status,tips)=>{
+            // this.confirmLoading = false
+            if(0===status){
+              this.$notification.success({message: tips})
+              this.$router.push({path:'/login'})
+            }
+            else{
+              this.$notification.error({message: tips})
+              console.log(tips)
+            }
+          })
+          //this.getKey (values.email, values.password)
         }
       })
     },
-    getKey (email, password) {
-      return getPublicKey(email).then(res => {
-        if (res.success === true) {
-          this.userInfo.upassword=rsaEncrypt(password, res.data)
-          this.submitInfo({...this.userInfo,...this.captchaInfo})
-        } else {
-          this.$notification.error({message: '注册失败'})
-        }
-      }).catch(ex => {
-        $message.error(`注册失败: ${err.message}`)
-      })
-    },
-    submitInfo (info) {
-      register(info).then(res => {
-        if (res.success === true) {
-          this.$notification.success({message: '注册成功'})
-          this.$router.push({path:'/login'})
-        } else {
-          this.$notification.error({message: '注册失败'})
-        }
-      }).catch(ex => {
-        $message.error(`注册失败: ${err.message}`)
-      })
-    },
+    // getKey (email, password) {
+    //   return getPublicKey(email).then(res => {
+    //     if (res.success === true) {
+    //       this.userInfo.upassword=rsaEncrypt(password, res.data)
+    //       this.submitInfo(this.userInfo,this.captchaInfo)
+    //       return
+    //     }
+    //       this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
+    //   }).catch(ex => {
+    //     this.requestFailed(ex)
+    //   })
+    // },
+    // submitInfo (info,token) {
+    //   register(info,token).then(res => {
+    //     if (res.success === true) {
+    //       this.$notification.success({message: '注册成功'})
+    //       this.$router.push({path:'/login'})
+    //       return
+    //     }
+    //     this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
+    //   }).catch(ex => {
+    //     this.requestFailed(ex)
+    //   })
+    // },
     getCaptcha (e) {
       e.preventDefault()
       const { form: { validateFields }, state, $message, $notification } = this
@@ -246,21 +257,6 @@ export default {
 
             this.hide = $message.loading('验证码发送中..', 0)
             this.send(values.email)
-
-            // getSmsCaptcha({ mobile: values.mobile }).then(res => {
-            //   setTimeout(hide, 2500)
-            //   $notification['success']({
-            //     message: '提示',
-            //     description: '验证码获取成功，您的验证码为：' + res.result.captcha,
-            //     duration: 8
-            //   })
-            // }).catch(err => {
-            //   setTimeout(hide, 1)
-            //   clearInterval(interval)
-            //   state.time = 60
-            //   state.smsSendBtn = false
-            //   this.requestFailed(err)
-            // })
           }
         }
       )
@@ -273,11 +269,11 @@ export default {
           this.captchaInfo.code=res.data.code
           alert(res.data.code)
           this.$notification.success({message: '验证码已发送'})
-        } else {
-          this.$notification.error({message: '验证码发送失败'})
+          return
         }
+        this.$notification.error({message: `验证码发送失败: ${errorTipsMap[res.data]}`})
       }).catch(ex => {
-        $message.error(`验证码发送失败: ${err.message}`)
+        this.requestFailed(ex)
       })
     },
     requestFailed (err) {
@@ -286,7 +282,7 @@ export default {
         description: ((err.response || {}).data || {}).message || '请求出现错误，请稍后再试',
         duration: 4
       })
-      this.registerBtn = false
+      this.registerBtn = true
     }
   }
 }

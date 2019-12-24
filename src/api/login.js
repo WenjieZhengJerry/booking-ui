@@ -32,11 +32,12 @@ export function sendCaptcha (email) {
 }
 
 // 注册用户 
-export function register (parameter) {
+export function register (info, token) {
   return axios({
     url: api.register, 
     method: 'post',
-    params: parameter
+    data: info,
+    headers:token
   })
 }
 
