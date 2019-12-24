@@ -1,46 +1,66 @@
 <template>
+<a-locale-provider :locale="zh_CN">
   <a-layout id="components-layout-demo-fixed">
     <!-- 头部 -->
     <v-header />
+    <a-spin :spinning="spinning">
     <a-layout-content :style="{ padding: '0 50px', marginTop: '90px' }">
       <div class="center-container">
+        <div class="title">
+          <span style="cursor: pointer" @click="() => {this.$router.go(-1)}"><a-icon type="arrow-left" /> 返回订单列表</span>
+        </div>
         <div class="title">
           <h4>订单信息</h4>
         </div>
         <div class="order-info">
           <div class="section td-fir">
-            <p>订单状态：<b class="green">已取消</b></p>
-            <p>订单编号：<b>102719800235</b></p>
-            <p>预订日期：<b>2019-11-13 10:15:40</b></p>
+            <p>订单状态：<b :class="order.status | statusTypeFilter">{{ order.status | statusFilter }}</b></p>
+            <p>订单编号：<b>{{ order.oid }}</b></p>
+            <p>预订日期：<b>{{ order.createTime }}</b></p>
           </div>
           <div class="section td-sec">
-            <p>订单金额：￥598.00</p>
-            <p>支付金额：￥598.00</p>
+            <p>订单金额：￥{{ order.totalPrice }}</p>
+            <p>支付金额：￥{{ order.totalPrice }}</p>
           </div>
           <div class="section td-thi">
-            <a-button type="danger">删除订单</a-button>
+            <a-button @click="pay(order)" v-if="order.status == 'UNPAY'" type="primary" class="btn" style="width: 88px">去付款</a-button>
+            <a-button v-else-if="order.status == 'UNUSE'" type="danger">
+              <a-popconfirm title="是否要取消此订单？" @confirm="deleteThis(order.oid)">
+                <a>取消订单</a>
+              </a-popconfirm>
+            </a-button>
+            <a-button v-else type="danger">
+              <a-popconfirm title="是否要删除此订单？" @confirm="deleteThis(order.oid)">
+                <a>删除订单</a>
+              </a-popconfirm>
+            </a-button>
           </div>
         </div>
         <div class="info-item">
-          <h4>锦江国际饭店</h4>
-          <p>房型：标准单人房，1间，共1晚 ，不含早</p>
-          <p>酒店地址：上海市黄浦区南京西路170号</p>
-          <p>联系电话：86-00-00000000</p>
+          <h4>{{ order.hotel.hname }}</h4>
+          <p>
+            房型：{{ order.room.type | roomTypeFilter }}，
+            {{ order.count }}间，共{{ dateCount }}晚 ，
+            {{ order.room.breakfast }}，
+            {{ order.room.cancel }}
+          </p>
+          <p>酒店地址：{{ order.hotel.address }}</p>
+          <p>联系电话：{{ order.hotel.phone}}</p>
         </div>
         <div class="info-item">
           <h4>入住信息</h4>
           <ul>
             <li>
-              <p><span>入住人：</span>小泽又沐风</p>
+              <p><span>入住人：</span>{{ order.checkInPerson }}</p>
             </li>
             <li>
-              <p><span>入住日期：</span>2019-11-21</p>
+              <p><span>入住日期：</span>{{ order.startTime }}</p>
             </li>
             <li>
-              <p><span>手机：</span>86-12345678910</p>
+              <p><span>手机：</span>{{ order.telephone }}</p>
             </li>
             <li>
-              <p><span>离店日期：</span>2019-11-22</p>
+              <p><span>离店日期：</span>{{ order.endTime }}</p>
             </li>
           </ul>
           <div class="gift-box">
@@ -58,34 +78,123 @@
               <p><span>支付方式：</span>线上预付</p>
             </li>
             <li>
-              <p><span>支付金额：</span>￥598.00</p>
+              <p><span>支付金额：</span>￥{{ order.totalPrice }}</p>
             </li>
             <li>
-              <p><span>支付状态：</span>未付款</p>
+              <p>
+                <span>支付状态：</span>
+                <span v-if="order.status == 'UNPAY' || order.status == 'CANCEL'">未付款</span>
+                <span v-else>已付款</span>
+              </p>
             </li>
           </ul>
         </div>
       </div>
     </a-layout-content>
+    </a-spin>
     <!-- 尾部 -->
     <v-footer />
   </a-layout>
+</a-locale-provider>
 </template>
 
 <script>
+import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import Header from './Header'
 import Footer from './Footer'
+import { deleteOrder } from '@/api/order'
+
+const orderStatusMap = {
+  UNPAY: {
+    status: 'warning',
+    text: '待付款'
+  },
+  UNUSE: {
+    status: 'processing',
+    text: '待入住'
+  },
+  CANCEL: {
+    status: 'default',
+    text: '已取消'
+  },
+  SUCCESS: {
+    status: 'success',
+    text: '已完成'
+  }
+}
+
+const roomTypesMap = {
+  STANDARD: {
+    text: '标准房'
+  },
+  SUPERIOR: {
+    text: '高级房'
+  },
+  DELUXE: {
+    text: '豪华房'
+  },
+  BUSINESS: {
+    text: '商务房'
+  },
+}
 
 export default {
- name: 'OrderDetail',
- components: {
+  name: 'OrderDetail',
+  components: {
     'v-header': Header,
     'v-footer': Footer
   },
- data () {
-  return {
-  };
- }
+  filters: {
+    statusFilter (type) {
+      return orderStatusMap[type].text
+    },
+    statusTypeFilter (type) {
+      return orderStatusMap[type].status
+    },
+    roomTypeFilter (type) {
+      return roomTypesMap[type].text
+    }
+  },
+  created: function() {
+    this.order = this.$route.params.order
+    this.dateCount = this.$route.params.dateCount
+  },
+  data () {
+    return {
+      zh_CN,
+      spinning: false,
+      order: undefined,
+      dateCount: undefined
+    };
+  },
+  methods: {
+    pay: function(order) {
+      this.$router.push({
+        name: 'Pay',
+        params: {
+          hotel: order.hotel,
+          roomType: this.$options.filters['roomTypeFilter'](order.room.type),
+          startTime: order.startTime,
+          endTime: order.endTime,
+          totalPrice: order.totalPrice,
+          oid: order.oid
+        }
+      })
+    },
+    deleteThis: function(oid) {
+      this.spinning = true
+      deleteOrder(oid).then(res => {
+        if (res.success == true) {
+          this.$message.success("删除成功")
+          this.$router.go(-1)
+        } else {
+          this.$message.error(`删除订单失败: ${res.data}`)
+        }
+      }).catch(err => {
+       this.$message.error(`删除订单异常: ${err.message}`)
+     })
+    }
+  }
 }
 
 </script>
@@ -132,8 +241,20 @@ export default {
   margin: 0;
 }
 
-.center-container .td-fir .green {
-  color: #66c61f;
+.center-container .td-fir .default {
+  color: #d9d9d9;
+}
+
+.center-container .td-fir .success {
+  color: #52c41a;
+}
+
+.center-container .td-fir .processing {
+  color: #1890ff;
+}
+
+.center-container .td-fir .warning {
+  color: #faad14;
 }
 
 .center-container .td-sec {

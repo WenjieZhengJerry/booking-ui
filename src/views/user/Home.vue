@@ -139,12 +139,12 @@
                     <a href="javascript:;" @click="goTo(hotel.hid)"><img src="@/assets/hotel-demo1.jpg" /></a>
                   </div>
                   <div class="middle">
-                    <p class="h-name"><a href="javascript:;" @click="goTo">{{ hotel.hname }}</a></p>
+                    <p class="h-name"><a href="javascript:;" @click="goTo(hotel.hid)">{{ hotel.hname }}</a></p>
                     <p>地址：{{ hotel.address }}</p>
                     <!-- <p>距离市中心 {{ hotel.distance }} km</p> -->
                     <a-tag color="blue">{{ hotel.type | hotelTypeFilter }}</a-tag>
                     <div :style="{ color: '#bdbdbd', marginTop: '10px' }">
-                      <template v-for="service in hotel.service.split(',')">
+                      <template v-for="service in hotel.service.split('，')">
                         <a-icon :key="service" :type="service | serviceFilter" /> {{ service }} &nbsp;
                       </template>
                     </div>

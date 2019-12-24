@@ -4,141 +4,75 @@
     <div class="title">
       <h4>酒店订单</h4>
       <div class="form-inline">
-        <a-select defaultValue="SIX-MONTH" style="width: 150px">
-          <a-select-option value="WAIT-CHECK-IN">待入住</a-select-option>
-          <a-select-option value="WAIT-PAY">待付款</a-select-option>
-          <a-select-option value="COMPLETE">已完成</a-select-option>
-          <a-select-option value="SIX-MONTH">近6个月订单</a-select-option>
+        <a-select :defaultValue="status" v-model="status" @change="handleChangeStatus" style="width: 150px">
+          <a-select-option value="ALL">全部</a-select-option>
+          <a-select-option value="UNUSE">待入住</a-select-option>
+          <a-select-option value="UNPAY">待付款</a-select-option>
+          <a-select-option value="SUCCESS">已完成</a-select-option>
+          <a-select-option value="CANCEL">已取消</a-select-option>
         </a-select>
       </div>
     </div>
     <div class="order-list">
       <ul>
-        <li>
+        <li v-for="(order, index) in orders" :key="index">
           <div class="title">
             <span>
               订单号：
-              <router-link to="/orderDetail">102719800235</router-link>
+              <a @click="detail(order)">{{ order.oid }}</a>
             </span>
-            <span>预订日期：2019-11-13</span>
+            <span>预订日期：{{ order.createTime }}</span>
           </div>
           <div class="content">
             <div class="h-info">
               <div class="pic">
-                <router-link to="/orderDetail">
-                  <img src="@/assets/order-img-demo.jpg" alt="">
-                </router-link>
+                <a @click="detail(order)">
+                  <img :src="'/api' + order.hotel.img">
+                </a>
               </div>
               <div class="section">
-                <router-link to=""><h4>锦江国际饭店</h4></router-link>
-                <p>标准单人房</p>
-                <p>入住日期：2019-11-21</p>
-                <p>离店日期：2019-11-22</p>
-                <p>共1晚</p>
+                <a @click="detail(order)"><h4>{{ order.hotel.hname }}</h4></a>
+                <p>{{ order.room.rname }}({{ order.room.type | roomTypeFilter }})</p>
+                <p>入住日期：{{ order.startTime }}</p>
+                <p>离店日期：{{ order.endTime }}</p>
+                <p>共{{ getDateCount(order.endTime) - getDateCount(order.startTime) }}晚</p>
               </div>
             </div>
             <div class="price-box">
               <div class="section">
                 <p>总价</p>
                 <p class="price">
-                  <span>￥<b>598.00</b></span>
+                  <span>￥<b>{{ order.totalPrice }}</b></span>
                 </p>
               </div>
             </div>
             <div class="order-state">
-              <p>已取消</p>
+              <p><a-badge :status="order.status | statusTypeFilter" :text="order.status | statusFilter" /></p>
             </div>
             <div class="btn-box">
               <div class="section">
-                <a-button type="primary" class="btn">再次预定</a-button>
-                <a-button type="danger" class="btn">删除订单</a-button>
+                <a-button @click="pay(order)" v-if="order.status == 'UNPAY'" type="primary" class="btn" style="width: 88px">去付款</a-button>
+                <a-button @click="detail(order)" v-if="order.status == 'UNUSE'" type="primary" class="btn">查看详情</a-button>
+                <a-button v-if="order.status == 'UNPAY' || order.status == 'UNUSE'" type="danger" class="btn">
+                  <a-popconfirm title="是否要取消此订单？" @confirm="deleteThis(order.oid)">
+                    <a>取消订单</a>
+                  </a-popconfirm>  
+                </a-button>
+                <a-button @click="bookAgain(order.hotel.hid)" v-if="order.status == 'SUCCESS' || order.status == 'CANCEL'"
+                  type="primary" class="btn">再次预定</a-button>
+                <a-button @click="bookAgain(order.hotel.hid)" v-if="order.status == 'SUCCESS'"
+                  type="default" class="btn" style="width: 88px">去评价</a-button>
+                <a-button v-if="order.status == 'CANCEL'" type="danger" class="btn">
+                  <a-popconfirm title="是否要删除此订单？" @confirm="deleteThis(order.oid)">
+                    <a>删除订单</a>
+                  </a-popconfirm>
+                </a-button>
               </div>
             </div>
           </div>
         </li>
-        <li>
-          <div class="title">
-            <span>
-              订单号：
-              <router-link to="/orderDetail">102719800235</router-link>
-            </span>
-            <span>预订日期：2019-11-13</span>
-          </div>
-          <div class="content">
-            <div class="h-info">
-              <div class="pic">
-                <router-link to="/orderDetail">
-                  <img src="@/assets/order-img-demo.jpg" alt="">
-                </router-link>
-              </div>
-              <div class="section">
-                <router-link to=""><h4>锦江国际饭店</h4></router-link>
-                <p>标准单人房</p>
-                <p>入住日期：2019-11-21</p>
-                <p>离店日期：2019-11-22</p>
-                <p>共1晚</p>
-              </div>
-            </div>
-            <div class="price-box">
-              <div class="section">
-                <p>总价</p>
-                <p class="price">
-                  <span>￥<b>598.00</b></span>
-                </p>
-              </div>
-            </div>
-            <div class="order-state">
-              <p>待入住</p>
-            </div>
-            <div class="btn-box">
-              <div class="section">
-                <a-button type="primary" class="btn">查看详情</a-button>
-                <a-button type="danger" class="btn">删除订单</a-button>
-              </div>
-            </div>
-          </div>
-        </li>
-        <li>
-          <div class="title">
-            <span>
-              订单号：
-              <router-link to="/orderDetail">102719800235</router-link>
-            </span>
-            <span>预订日期：2019-11-13</span>
-          </div>
-          <div class="content">
-            <div class="h-info">
-              <div class="pic">
-                <router-link to="/orderDetail">
-                  <img src="@/assets/order-img-demo.jpg" alt="">
-                </router-link>
-              </div>
-              <div class="section">
-                <router-link to=""><h4>锦江国际饭店</h4></router-link>
-                <p>标准单人房</p>
-                <p>入住日期：2019-11-21</p>
-                <p>离店日期：2019-11-22</p>
-                <p>共1晚</p>
-              </div>
-            </div>
-            <div class="price-box">
-              <div class="section">
-                <p>总价</p>
-                <p class="price">
-                  <span>￥<b>598.00</b></span>
-                </p>
-              </div>
-            </div>
-            <div class="order-state">
-              <p>已取消</p>
-            </div>
-            <div class="btn-box">
-              <div class="section">
-                <a-button type="primary" class="btn">再次预定</a-button>
-                <a-button type="danger" class="btn">删除订单</a-button>
-              </div>
-            </div>
-          </div>
+        <li v-if="orders.length == 0" style="border: 0">
+          <a-empty />
         </li>
       </ul>
     </div>
@@ -147,14 +81,147 @@
 </template>
 
 <script>
-import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
+import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN'
+import { getMyOrders, getAOrder, deleteOrder } from '@/api/order'
+import { getHotelDetail } from '@/api/hotel'
+
+const orderStatusMap = {
+  UNPAY: {
+    status: 'warning',
+    text: '待付款'
+  },
+  UNUSE: {
+    status: 'processing',
+    text: '待入住'
+  },
+  CANCEL: {
+    status: 'default',
+    text: '已取消'
+  },
+  SUCCESS: {
+    status: 'success',
+    text: '已完成'
+  }
+}
+
+const roomTypesMap = {
+  STANDARD: {
+    text: '标准房'
+  },
+  SUPERIOR: {
+    text: '高级房'
+  },
+  DELUXE: {
+    text: '豪华房'
+  },
+  BUSINESS: {
+    text: '商务房'
+  },
+}
 
 export default {
  name: 'MyOrders',
+ created: function() {
+   this.loadingData()
+ },
+ filters: {
+    statusFilter (type) {
+      return orderStatusMap[type].text
+    },
+    statusTypeFilter (type) {
+      return orderStatusMap[type].status
+    },
+    roomTypeFilter (type) {
+      return roomTypesMap[type].text
+    }
+  },
  data () {
   return {
-    zh_CN
+    zh_CN,
+    status: 'ALL',
+    orders: []
   };
+ },
+ methods: {
+   loadingData: function() {
+     let uid = 1
+     getMyOrders(uid, this.status).then(res => {
+       if (res.success == true) {
+         this.orders = res.data
+        //  console.log(this.orders[0])
+       } else {
+         this.$message.error(`加载订单失败: ${res.data}`)
+       }
+     }).catch(err => {
+       this.$message.error(`加载订单异常: ${err.message}`)
+     })
+   },
+   handleChangeStatus: function() {
+     this.loadingData()
+   },
+   getDateCount: function(date) {
+     return date.split(' ')[0].split('/')[2]
+   },
+   pay: function(order) {
+     this.$router.push({
+        name: 'Pay',
+        params: {
+          hotel: order.hotel,
+          roomType: this.$options.filters['roomTypeFilter'](order.room.type),
+          startTime: order.startTime,
+          endTime: order.endTime,
+          totalPrice: order.totalPrice,
+          oid: order.oid
+        }
+      })
+   },
+   detail: function(order) {
+     getAOrder(order.oid).then(res => {
+       if (res.success == true) {
+         this.$router.push({
+           name: 'OrderDetail',
+           params: {
+             order: res.data,
+             dateCount: this.getDateCount(res.data.endTime) - this.getDateCount(res.data.startTime)
+           }
+         })
+       } else {
+         this.$message.error(`获取订单失败: ${res.data}`)
+       }
+     }).catch(err => {
+       this.$message.error(`获取订单异常: ${err.message}`)
+     })
+   },
+   bookAgain: function(hid) {
+     getHotelDetail(hid)
+        .then(res => {
+          if (res.success == true) {
+            this.$router.push({
+              name: 'HotelDetail',
+              params: { 
+                hotelDetail: res.data 
+              }
+            })
+          } else {
+            this.$message.error(`获取酒店失败: ${res.data}`)
+          }
+        })
+        .catch(err => {
+          this.$message.error(`获取酒店异常: ${err.message}`)
+        })
+   },
+   deleteThis: function(oid) {
+      deleteOrder(oid).then(res => {
+        if (res.success == true) {
+          this.$message.success("删除成功")
+          this.$router.go(0)
+        } else {
+          this.$message.error(`删除订单失败: ${res.data}`)
+        }
+      }).catch(err => {
+       this.$message.error(`删除订单异常: ${err.message}`)
+     })
+    }
  }
 }
 
@@ -285,7 +352,7 @@ export default {
 .order-list .order-state {
   float: left;
   height: 100%;
-  width: 130px;
+  width: 145px;
   text-align: center;
   font-size: 0;
   box-sizing: border-box;

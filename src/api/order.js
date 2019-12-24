@@ -60,3 +60,20 @@ import {
       method: 'put'
     })
   }
+
+  //获取用户自己的订单
+  export function getMyOrders(id, orderStatus) {
+    return axios({
+      url: `${api.order}/user/${id}`,
+      method: 'get',
+      params: { 'orderStatus': orderStatus }
+    })
+  }
+
+  //获取一条订单详情
+  export function getAOrder(id) {
+    return axios({
+      url: `${api.order}/${id}`,
+      method: 'get'
+    })
+  }

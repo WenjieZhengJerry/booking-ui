@@ -152,7 +152,7 @@
               <div id="hotel-service" class="tab-pane">
                 <h4>酒店服务</h4>
                 <ul class="list">
-                  <li v-for="(service, index) in hotel.service.split(',')" :key="index">
+                  <li v-for="(service, index) in hotel.service.split('，')" :key="index">
                     <a-icon type="check" /> {{ service }}
                   </li>
                 </ul>
