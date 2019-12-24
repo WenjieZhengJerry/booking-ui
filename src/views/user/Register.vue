@@ -198,7 +198,7 @@ export default {
         if (!err) {
           this.captchaInfo.code=values.captcha
           this.userInfo.email=values.email
-          this.userInfo.upassword=values.upassword
+          this.userInfo.upassword=values.password
           registerUser(this.userInfo,this.captchaInfo,(status,tips)=>{
             // this.confirmLoading = false
             if(0===status){

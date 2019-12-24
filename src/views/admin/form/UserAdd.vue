@@ -169,7 +169,7 @@ export default {
       this.helpText.upassword=null
       this.form.resetFields()
     },
-    notificationParent(){this.$emit('add',true)},
+    notificationParent(){this.$emit('add')},
     handleOk(e) {
       const { form: { validateFields } } = this;
       this.form.validateFields({ force: true }, (errors, values) => {
@@ -188,7 +188,8 @@ export default {
             const interval = window.setInterval(() => {window.clearInterval(interval)}, 500)
             this.$notification.success({message: tips})
             this.init()
-            this.notificationParent()
+            this.$emit('add')
+            //this.notificationParent()
           }
           else{
             this.$notification.error({message: tips})
