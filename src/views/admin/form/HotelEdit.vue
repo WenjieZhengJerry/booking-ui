@@ -1,4 +1,4 @@
-<!--添加酒店页面-->
+<!--编辑酒店-->
 <template>
  <div>
     <!--
@@ -8,7 +8,7 @@
          @cancel="handleCancel"     this.visible=false
     -->
     <a-modal
-      title="添加酒店"
+      title="编辑酒店"
       :width="640"
       :visible="visible"
       :confirmLoading="confirmLoading"
@@ -18,16 +18,13 @@
       <a-spin :spinning="confirmLoading">
         <a-form :form="form">
           <a-form-item label="酒店名字" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input placeholder="酒店名字" v-decorator="['hname',
+            <a-input v-decorator="['hname',
             {rules: [{required: true, message: '请输入酒店名字'}]}]"></a-input>
           </a-form-item>
 
           <a-form-item label="酒店地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input
-              placeholder="酒店地址"
-              v-decorator="['address',
-              {rules: [{ required: true, message: '地址不能为空' }]}]"
-            ></a-input>
+            <a-input :maxLength="11" v-decorator="['address',
+            {rules: [{required: true, message: '请输入酒店地址'}]}]"></a-input>
           </a-form-item>
 
           <a-form-item label="酒店图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
@@ -54,33 +51,34 @@
           <a-form-item label="酒店描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-textarea placeholder="酒店描述"
             v-decorator="['description',
-            {initialValue: description, rules: [{required: true, message: '请输入酒店描述'}]}]" autosize />
-            <!-- <a-input placeholder="酒店描述" v-model="description"></a-input> -->
+            {rules: [{required: true, message: '请输入酒店描述'}]}]" autosize />
           </a-form-item>
 
           <a-form-item label="酒店服务" :labelCol="labelCol" :wrapperCol="wrapperCol">
-             <a-checkbox-group :options="service"
+            <a-checkbox-group :options="service"
              v-decorator="['service',
-             {rules: [{required: true, message: '请选择酒店服务'}]}]" />
-             <!-- <a-checkbox-group :options="service" v-model="checkedServiceList" @change="onSeriveChange" /> -->
+             {initialValue: defaultService, rules: [{required: true, message: '请选择酒店服务'}]}]" />
           </a-form-item>
 
           <a-form-item label="酒店设施" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-checkbox-group :options="facilities"
             v-decorator="['facilities',
-            {rules: [{required: true, message: '请选择酒店设施'}]}]" />
+            {initialValue: defaultFacilities, rules: [{required: true, message: '请选择酒店设施'}]}]" />
           </a-form-item>
 
           <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input placeholder="联系电话"
-              v-decorator="['phone',
-              {rules: [{required: true, message: '请输入联系电话'},{validator: handleCheckPhone}]}]"
-            ></a-input>
+            <a-input v-decorator="['phone',
+            {rules: [{required: true, message: '请输入联系电话'},{validator: handleCheckPhone}]}]"></a-input>
+          </a-form-item>
+
+          <a-form-item label="酒店评分" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-input v-decorator="['rate',
+            {rules: [{required: true, message: '请选择酒店评分'}]}]"></a-input>
           </a-form-item>
 
           <a-form-item label="酒店类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-select v-decorator="['type', 
-            {initialValue: 'APARTMENT',rules: [{required: true, message: '请选择酒店类型'}]}]" 
+            {initialValue: 'type',rules: [{required: true, message: '请选择酒店类型'}]}]" 
             placeholder="请选择">
               <a-select-option value="APARTMENT">公寓</a-select-option>
               <a-select-option value="HOMESTAY">民宿</a-select-option>
@@ -96,11 +94,18 @@
 </template>
 
 <script>
+import pick from 'lodash.pick' //https://blog.csdn.net/suwu150/article/details/75250749
 import { uploadImg, deleteFile } from '@/api/upload'
-import { addHotel } from '@/api/hotel'
+import { updateHotel } from '@/api/hotel'
 
 export default {
- name: 'HotelAdd',
+ name: 'HotelEdit',
+ props: {
+    record: {
+      type: [Object, String],
+      default: ''
+    }
+  },
  data () {
     return {
       labelCol: {
@@ -114,14 +119,16 @@ export default {
       visible: false,
       confirmLoading: false,
       form: this.$form.createForm(this),
-      description: "于2010年开业，东莞市维也纳国际酒店旗舰店，适合广大人群入驻",
-      facilities: ['停车场', '餐厅', '健身房'],
-      service: ['接待外宾', '叫醒服务'],
       previewVisible: false,
       previewImage: '',
       fileList: [],
-      loading: false,
-      isUpload: false
+      isUpload: false,
+      previewImage: '',
+      facilities: ['停车场', '餐厅', '健身房'],
+      service: ['接待外宾', '叫醒服务'],
+      defaultService: [],
+      defaultFacilities: [],
+      hid: ''
    };
  },
 
@@ -130,59 +137,50 @@ export default {
  computed: {},
 
  methods: {
-    add() {
-      this.visible = true
-      this.form.resetFields()
-      //解决每次打开添加酒店表单时遗留上次的图片数据和校验提示
-      this.fileList = []
-      this.isUpload = false
-    },
     handleCancel() {
-      //关闭添加酒店表单
-      this.visible = false
+        //关闭酒店编辑框
+        this.visible = false
     },
-    handleSubmit() {
-      const {
-        form: { validateFields }
-      } = this
-      this.confirmLoading = true
-      validateFields((errors, values) => {
-        this.isUpload = this.fileList.length==0
-        if (!errors && !this.isUpload) {
-          let imgUrl = this.fileList[0].response.data.imgUrl
-          let parameter = {
-            'hname': values.hname,
-            'description': values.description,
-            'facilities': values.facilities.toString(),
-            'service': values.service.toString(),
-            'type': values.type,
-            'address': values.address,
-            'phone': values.phone,
-            'address': values.address,
-            'img': imgUrl,
-            'rate': 5.0
-          }
-          return addHotel(parameter).then(res => {
-            if (res.success === true) {
-              this.visible = false
-              this.confirmLoading = false
-              this.$emit('ok', values)
-              this.$message.success('添加酒店成功！')
-            } else {
-              this.confirmLoading = false
-              this.$message.error({
-                message: '添加酒店失败！'
-              })
+    edit(record) {
+        //显示编辑框
+        this.visible = true
+        //清除上次编辑的数据
+        this.isUpload = false
+        this.defaultService = []
+        this.defaultFacilities = []
+        this.fileList = []
+        //通过pick获取编辑record记录需要填充到表单的数据字段
+        //注意：setFieldsValue(formData) 填充的数据必须和表单中的 输入元素必须一致
+        const {
+            form: { setFieldsValue }
+        } = this
+        const formData = pick(record, 
+            ['hid', 'hname', 'address', 'img', 'description', 'service', 'facilities', 'phone', 'type', 'rate']
+        )
+        if(formData.img != null && formData.img != ""){
+            let file = {
+                uid: '-1',
+                name: '酒店图片',
+                status: 'done',
+                url: `/api${formData.img}`,
             }
-          }).catch(err => {
-              this.confirmLoading = false
-              this.$message.error(`添加酒店出错！: ${err.message}`)
-          }) 
-        } else {
-            this.confirmLoading = false
+            this.fileList.push(file)
         }
-      })
+        this.defaultService = formData.service.split(',')
+        this.defaultFacilities = formData.facilities.split(',')
+        this.hid = formData.hid
+        this.$nextTick(() => {
+            setFieldsValue({
+            'hname': formData.hname,
+            'address': formData.address,
+            'description': formData.description,
+            'phone': formData.phone,
+            'rate': formData.rate,
+            'type': formData.type
+            })
+        })
     },
+    /*-----------文件上传相关函数--------------*/
     handleData() {
         //console.log(`设置文件上传参数`)
         return {
@@ -204,20 +202,22 @@ export default {
         /* console.log(JSON.stringify(file)); // file 是当前正在上传的 单个 img
         console.log(JSON.stringify(fileList)); // fileList 是已上传的全部 img 列表 */
         this.fileList = fileList;
-        //图片上传成功后将文件上传警告去除
+        //文件上传成功更新数据库中酒店图片路径
         if(file.status == "done") {
             this.isUpload = false
+            updateHotel({'hid': this.hid, 'img': this.fileList[0].response.data.imgUrl}) //更新酒店图片
         }
     },
     handleRemove(file) {
         //返回值为false不删除文件，true时删除文件
-        if(file.response.data==undefined||file.response.data.imgUrl=="") {
+        /* if(file == undefined || file.response.data == undefined || file.response.data.imgUrl == "") {
             this.$message.error(`文件不存在！`)
             return false
-        }
-        let filePath = file.response.data.imgUrl;
+        } */
+        let filePath = file.response != undefined ? file.response.data.imgUrl : this.fileList[0].url.substring(4);
         deleteFile({"filePath" : filePath}).then(res => {
             if(res.success === true){
+                updateHotel({'hid': this.hid, 'img': ''}) //更新酒店图片
                 this.$message.success(`文件删除成功！`)
                 return true;
             }else{
@@ -227,6 +227,49 @@ export default {
         }).catch(err => {
             this.$message.error(`文件删除出错！: ${err.message}`)
         })
+    },
+    /*-----------文件上传相关函数结束--------------*/
+    handleSubmit() {
+        const {
+        form: { validateFields }
+      } = this
+      this.confirmLoading = true
+      validateFields((errors, values) => {
+        this.isUpload = this.fileList.length==0
+        if (!errors && !this.isUpload) {
+          let imgUrl = this.fileList[0].response != undefined ? this.fileList[0].response.data.imgUrl : this.fileList[0].url.substring(4)
+          let parameter = {
+            'hid': this.hid,
+            'hname': values.hname,
+            'description': values.description,
+            'facilities': values.facilities.toString(),
+            'service': values.service.toString(),
+            'type': values.type,
+            'address': values.address,
+            'phone': values.phone,
+            'img': imgUrl,
+            'rate': values.rate
+          }
+          return updateHotel(parameter).then(res => {
+            if (res.success === true) {
+              this.visible = false
+              this.confirmLoading = false
+              this.$emit('ok', values)
+              this.$message.success('更新酒店成功！')
+            } else {
+              this.confirmLoading = false
+              this.$message.error({
+                message: '更新酒店失败！'
+              })
+            }
+          }).catch(err => {
+              this.confirmLoading = false
+              this.$message.error(`更新酒店出错！: ${err.message}`)
+          }) 
+        } else {
+            this.confirmLoading = false
+        }
+      })
     },
     handleCheckPhone(rule, value, callback) {
       //验证联系电话

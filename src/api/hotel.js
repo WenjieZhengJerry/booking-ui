@@ -36,6 +36,14 @@ export function addHotel (parameter) {
         data: parameter
     })
 }
+//更新酒店信息
+export function updateHotel (parameter) {
+    return axios({
+        url: `${api.hotel}/${parameter.hid}`,
+        method: 'put',
+        data: parameter
+    })
+}
 
 /*-----------------------------------------------------------------------*/
 
