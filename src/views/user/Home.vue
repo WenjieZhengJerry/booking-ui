@@ -144,7 +144,7 @@
                     <!-- <p>距离市中心 {{ hotel.distance }} km</p> -->
                     <a-tag color="blue">{{ hotel.type | hotelTypeFilter }}</a-tag>
                     <div :style="{ color: '#bdbdbd', marginTop: '10px' }">
-                      <template v-for="service in hotel.service.split('，')">
+                      <template v-for="service in hotel.service.split(',')">
                         <a-icon :key="service" :type="service | serviceFilter" /> {{ service }} &nbsp;
                       </template>
                     </div>

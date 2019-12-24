@@ -92,7 +92,7 @@
       </span> -->
       <span slot="action" slot-scope="text, record">
         <template>
-          <a @click="handleAddRoom(record.hid)" title="查看酒店房型"><a-icon type="eye" /></a>
+          <router-link :to="{name: 'RoomManage', params: {hid: record.hid}}" title="查看酒店房型"><a-icon type="eye" /></router-link>
           <a-divider type="vertical" />
           <a @click="handleEdit(record)" title="编辑酒店"><a-icon type="edit"/></a>
           <a-divider type="vertical" />
@@ -101,8 +101,8 @@
           </a-popconfirm>
         </template>
       </span>
-      <!-- 使用编辑子组件 ref绑定子组件的名字 -->
     </s-table>
+    <!-- 使用编辑子组件 ref绑定子组件的名字 -->
     <!-- <order-edit ref="editModal" @ok="handleOk" />-->
     <hotel-add ref="addModal" @ok="handleOk" /> 
     <hotel-edit ref="editModal" @ok="handleOk" /> 
