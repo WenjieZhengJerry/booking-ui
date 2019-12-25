@@ -1,4 +1,5 @@
 <template>
+<a-locale-provider :locale="zh_CN">
  <a-card :bordered="false">
    <!-- 多条件查询开始 -->
 
@@ -107,6 +108,7 @@
     <hotel-add ref="addModal" @ok="handleOk" /> 
     <hotel-edit ref="editModal" @ok="handleOk" /> 
   </a-card>
+  </a-locale-provider>
 </template>
 
 <script>

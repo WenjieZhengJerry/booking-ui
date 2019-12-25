@@ -1,5 +1,6 @@
 <!--房型管理-->
 <template>
+<a-locale-provider :locale="zh_CN">
  <div>
    <router-link :to="{name: 'HotelManage'}" title="返回酒店管理">
       <a-icon type="rollback" :style="{ fontSize: '30px' }"/>&nbsp;&nbsp;&nbsp;返回酒店管理
@@ -54,6 +55,7 @@
     <room-add ref="addModal" @ok="handleOk" />
     <room-edit ref="editModal" @ok="handleOk" />  
  </div>
+</a-locale-provider>
 </template>
 
 <script>

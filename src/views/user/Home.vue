@@ -154,7 +154,7 @@
                     <a-rate :defaultValue="hotel.rate" allowHalf disabled />
                   </div>
                   <div class="more">
-                    ￥<span class="price">{{ hotel.minPrice }}</span>起
+                    ￥<span class="price">{{ hotel.landprice }}</span>起
                     <a-button @click="goTo(hotel.hid)" class="detail-btn">查看详情</a-button>
                   </div>
                 </div>  
