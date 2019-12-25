@@ -34,12 +34,13 @@
 <script>
 import { errorTipsMap } from '@/utils/errorTips'
 import { isLogin, logout } from '@/api/login'
+import { user_info, setUserInfo } from '@/utils/encrypt'
 export default {
  name: 'Header',
  data () {
     return {
       is_login:false,
-      userInfo:{}
+      userInfo:null
     }
  },
   methods: {
@@ -49,6 +50,8 @@ export default {
     exit(item){
       logout().then(res => {
         if (res.success === true) {
+          this.is_login=false
+          setUserInfo(null)
           this.$router.push('/login')
           return
         }
@@ -58,23 +61,14 @@ export default {
       })
     }
   },
-  created () {
-    isLogin().then(res => {
-      if (res.success === true) {
-        if(null!==res.data){
-          this.userInfo=res.data
-          this.is_login=true
-          return
-        }
-      }
+  created (){
+    if(null===user_info){
       this.is_login=false
-      console.log('isLogin error',errorTipsMap[res.data])
-    }).catch(ex => {
-      console.log('isLogin error',ex.message)
-    })
-  },
-  beforeUpdate(){
-    alert("beforeUpdate Header")
+    }
+    else{
+      this.is_login=true
+      this.userInfo=user_info
+    }
   }
 }
 

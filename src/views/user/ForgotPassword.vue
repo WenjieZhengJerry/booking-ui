@@ -105,6 +105,7 @@ export default {
       })
     },
     handleCancel(e) {
+      this.confirmLoading = false
       this.visible = false
     },
     handleValidCaptcha(rule, value, callback){

@@ -242,7 +242,7 @@ export default {
           this.captchaInfo.token=res.data.token
           this.captchaInfo.code=res.data.code
           alert(res.data.code)
-          this.$notification.success({message: '验证码已发送'})
+          this.$notification.success({message: `验证码已发送到邮箱: ${email}`})
           return
         }
         this.$notification.error({message: `验证码发送失败: ${errorTipsMap[res.data]}`})

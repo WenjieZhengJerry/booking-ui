@@ -129,7 +129,7 @@ export default {
       telephone: '',
       email: '',
       type: 0,
-      icon: '/api/upload/user/avatar/default_avatar.jpeg',
+      icon: '/upload/user/avatar/default_avatar.jpeg',
       enable: true
     }
   };

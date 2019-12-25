@@ -43,6 +43,7 @@
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import Header from './Header'
 import Footer from './Footer'
+import { user_info, setUserInfo } from '@/utils/encrypt'
 import { errorTipsMap } from '@/utils/errorTips'
 import { isLogin, logout } from '@/api/login'
 export default {
@@ -55,7 +56,7 @@ export default {
   return {
     zh_CN,
     selectedKey: '2',
-    userInfo:{}
+    userInfo:user_info
   };
  },
  methods: {
@@ -79,18 +80,12 @@ export default {
      }
    }
  },
-  created () {
-    isLogin().then(res => {
-      if (res.success === true) {
-        if(null!==res.data){
-          this.userInfo=res.data
-          return
-        }
-      }
-      console.log('isLogin error',errorTipsMap[res.data])
-    }).catch(ex => {
-      console.log('isLogin error',ex.message)
-    })
+  created (){
+    if(null!==user_info){
+      this.userInfo=user_info
+      return
+    }
+    this.$router.push('/login')
   }
 }
 

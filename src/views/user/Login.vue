@@ -75,8 +75,8 @@
 import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
 import ForgotPassword from '@/views/user/ForgotPassword'
-import {getPublicKey, login } from '@/api/login'
-import {rsaEncrypt, loginUser } from '@/utils/encrypt'
+import {getPublicKey, login, isLogin } from '@/api/login'
+import {rsaEncrypt, loginUser, user_info, setUserInfo } from '@/utils/encrypt'
 import {errorTipsMap } from '@/utils/errorTips'
 
 export default {
@@ -112,7 +112,6 @@ export default {
             }
             else{
               this.$notification.error({message: tips})
-              console.log(tips)
             }
           })
         }
