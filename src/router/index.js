@@ -107,7 +107,15 @@ export default new Router({
         {
           path: '/admin/hotelManage',
           name: 'HotelManage',
-          component: () => import('@/views/admin/HotelManage')
+          component: () => import('@/views/admin/HotelManage'),
+          meta: {
+            keepAlive: true
+          }
+        },
+        {
+          path: '/admin/roomManage/:hid',
+          name: 'RoomManage',
+          component: () => import('@/views/admin/RoomManage')
         }
       ]
     }

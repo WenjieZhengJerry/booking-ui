@@ -1,4 +1,4 @@
-<!--编辑酒店-->
+<!--编辑房间-->
 <template>
  <div>
     <!--
@@ -8,7 +8,7 @@
          @cancel="handleCancel"     this.visible=false
     -->
     <a-modal
-      title="编辑酒店"
+      title="编辑房间"
       :width="640"
       :visible="visible"
       :confirmLoading="confirmLoading"
@@ -17,17 +17,12 @@
     >
       <a-spin :spinning="confirmLoading">
         <a-form :form="form">
-          <a-form-item label="酒店名字" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input v-decorator="['hname',
-            {rules: [{required: true, message: '请输入酒店名字'}]}]"></a-input>
+          <a-form-item label="房间名字" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-input v-decorator="['rname',
+            {rules: [{required: true, message: '请输入房间名字'}]}]"></a-input>
           </a-form-item>
 
-          <a-form-item label="酒店地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input :maxLength="11" v-decorator="['address',
-            {rules: [{required: true, message: '请输入酒店地址'}]}]"></a-input>
-          </a-form-item>
-
-          <a-form-item label="酒店图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
+          <a-form-item label="房间图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-upload
             action="/api/upload"
             :data="handleData"
@@ -43,48 +38,64 @@
             </div>
             </a-upload>
             <a-modal :visible="previewVisible" :footer="null" @cancel="handleCancelUploadImg">
-                <img alt="酒店图片" style="width: 100%" :src="previewImage" />
+                <img alt="房间图片" style="width: 100%" :src="previewImage" />
             </a-modal>
             <span v-show="isUpload" class="uploadValidator">请上传图片</span>
           </a-form-item>
 
-          <a-form-item label="酒店描述" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-textarea placeholder="酒店描述"
-            v-decorator="['description',
-            {rules: [{required: true, message: '请输入酒店描述'}]}]" autosize />
+          <a-form-item label="房间详情" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-textarea placeholder="房间详情"
+            v-decorator="['assitions',
+            {rules: [{required: true, message: '请输入房间详情'}]}]" autosize />
           </a-form-item>
 
-          <a-form-item label="酒店服务" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-checkbox-group :options="service"
-             v-decorator="['service',
-             {initialValue: defaultService, rules: [{required: true, message: '请选择酒店服务'}]}]" />
+          <a-form-item label="人数上限" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-select v-decorator="['people',
+            {initialValue: 'people',rules: [{required: true, message: '请选择人数上限'}]}]" placeholder="请选择">
+              <a-select-option value="1">1</a-select-option>
+              <a-select-option value="2">2</a-select-option>
+              <a-select-option value="3">3</a-select-option>
+              <a-select-option value="4">4</a-select-option>
+              <a-select-option value="5">5</a-select-option>
+              <a-select-option value="6">6</a-select-option>
+            </a-select>
           </a-form-item>
 
-          <a-form-item label="酒店设施" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-checkbox-group :options="facilities"
-            v-decorator="['facilities',
-            {initialValue: defaultFacilities, rules: [{required: true, message: '请选择酒店设施'}]}]" />
+          <a-form-item label="取消策略" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-select v-decorator="['cancel',
+            {initialValue: 'cancel',rules: [{required: true, message: '请选择取消策略'}]}]" placeholder="请选择">
+              <a-select-option value="限时取消">限时取消</a-select-option>
+              <a-select-option value="免费取消">免费取消</a-select-option>
+              <a-select-option value="不支持取消">不支持取消</a-select-option>
+            </a-select>
           </a-form-item>
 
-          <a-form-item label="联系电话" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input v-decorator="['phone',
-            {rules: [{required: true, message: '请输入联系电话'},{validator: handleCheckPhone}]}]"></a-input>
+          <a-form-item label="房间早餐" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-select v-decorator="['breakfast',
+            {initialValue: 'breakfast',rules: [{required: true, message: '请选择房间早餐'}]}]" placeholder="请选择">
+              <a-select-option value="含早">含早</a-select-option>
+              <a-select-option value="不含早">不含早</a-select-option>
+            </a-select>
           </a-form-item>
 
-          <a-form-item label="酒店评分" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input v-decorator="['rate',
-            {rules: [{required: true, message: '请选择酒店评分'}]}]"></a-input>
+          <a-form-item label="房间价格" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-input v-decorator="['price',
+            {rules: [{required: true, message: '请输入房间价格'},{validator: handleCheckPrice}]}]"></a-input>
           </a-form-item>
 
-          <a-form-item label="酒店类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
+           <a-form-item label="房间库存" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-input v-decorator="['stock',
+            {rules: [{required: true, message: '请输入房间库存'},{validator: handleCheckStock}]}]"></a-input>
+          </a-form-item>
+
+          <a-form-item label="房间类型" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-select v-decorator="['type', 
-            {initialValue: 'type',rules: [{required: true, message: '请选择酒店类型'}]}]" 
+            {initialValue: 'type',rules: [{required: true, message: '请选择房间类型'}]}]" 
             placeholder="请选择">
-              <a-select-option value="APARTMENT">公寓</a-select-option>
-              <a-select-option value="HOMESTAY">民宿</a-select-option>
-              <a-select-option value="HOSTEL">青旅</a-select-option>
-              <a-select-option value="ECONOMY">经济连锁</a-select-option>
-              <a-select-option value="HIGNEND">高级连锁</a-select-option>
+              <a-select-option value="STANDARD">标准房</a-select-option>
+              <a-select-option value="SUPERIOR">高级房</a-select-option>
+              <a-select-option value="DELUXE">豪华房</a-select-option>
+              <a-select-option value="BUSINESS">商务房</a-select-option>
             </a-select>
           </a-form-item>
         </a-form>
@@ -96,10 +107,10 @@
 <script>
 import pick from 'lodash.pick' //https://blog.csdn.net/suwu150/article/details/75250749
 import { uploadImg, deleteFile } from '@/api/upload'
-import { updateHotel } from '@/api/hotel'
+import { updateRoom } from '@/api/room'
 
 export default {
- name: 'HotelEdit',
+ name: 'RoomEdit',
  props: {
     record: {
       type: [Object, String],
@@ -123,11 +134,7 @@ export default {
       previewImage: '',
       fileList: [],
       isUpload: false,
-      facilities: ['停车场', '餐厅', '健身房'],
-      service: ['接待外宾', '叫醒服务'],
-      defaultService: [],
-      defaultFacilities: [],
-      hid: ''
+      rid: ''
    };
  },
 
@@ -136,54 +143,54 @@ export default {
  computed: {},
 
  methods: {
-    handleCancel() {
+   handleCancel() {
         //关闭酒店编辑框
         this.visible = false
-    },
-    edit(record) {
-        //显示编辑框
-        this.visible = true
         //清除上次编辑的数据
         this.isUpload = false
         this.defaultService = []
         this.defaultFacilities = []
         this.fileList = []
+    },
+    edit(record) {
+        //显示编辑框
+        this.visible = true
         //通过pick获取编辑record记录需要填充到表单的数据字段
         //注意：setFieldsValue(formData) 填充的数据必须和表单中的 输入元素必须一致
         const {
             form: { setFieldsValue }
         } = this
         const formData = pick(record, 
-            ['hid', 'hname', 'address', 'img', 'description', 'service', 'facilities', 'phone', 'type', 'rate']
+            ['rid', 'rname', 'people', 'assitions', 'cancel', 'breakfast', 'price', 'stock', 'img', 'type']
         )
+        this.rid = formData.rid
+        this.$nextTick(() => {
+            setFieldsValue({
+            'rname': formData.rname,
+            'people': formData.people,
+            'assitions': formData.assitions,
+            'price': formData.price,
+            'cancel': formData.cancel,
+            'breakfast': formData.breakfast,
+            'stock': formData.stock,
+            'type': formData.type
+            })
+        })
         if(formData.img != null && formData.img != ""){
             let file = {
                 uid: '-1',
-                name: '酒店图片',
+                name: '房间图片',
                 status: 'done',
                 url: `/api${formData.img}`,
             }
             this.fileList.push(file)
         }
-        this.defaultService = formData.service.split(',')
-        this.defaultFacilities = formData.facilities.split(',')
-        this.hid = formData.hid
-        this.$nextTick(() => {
-            setFieldsValue({
-            'hname': formData.hname,
-            'address': formData.address,
-            'description': formData.description,
-            'phone': formData.phone,
-            'rate': formData.rate,
-            'type': formData.type
-            })
-        })
     },
     /*-----------文件上传相关函数--------------*/
     handleData() {
         //console.log(`设置文件上传参数`)
         return {
-            directoryName: "hotel",
+            directoryName: "room",
         }
     },
     handleCancelUploadImg() {
@@ -204,7 +211,7 @@ export default {
         //文件上传成功更新数据库中酒店图片路径
         if(file.status == "done") {
             this.isUpload = false
-            updateHotel({'hid': this.hid, 'img': this.fileList[0].response.data.imgUrl}) //更新酒店图片
+            updateRoom({'rid': this.rid, 'img': this.fileList[0].response.data.imgUrl}) //更新房间图片
         }
     },
     handleRemove(file) {
@@ -216,7 +223,7 @@ export default {
         let filePath = file.response != undefined ? file.response.data.imgUrl : this.fileList[0].url.substring(4);
         deleteFile({"filePath" : filePath}).then(res => {
             if(res.success === true){
-                updateHotel({'hid': this.hid, 'img': ''}) //更新酒店图片
+                updateRoom({'rid': this.rid, 'img': ''}) //更新房间图片
                 this.$message.success(`文件删除成功！`)
                 return true;
             }else{
@@ -238,42 +245,50 @@ export default {
         if (!errors && !this.isUpload) {
           let imgUrl = this.fileList[0].response != undefined ? this.fileList[0].response.data.imgUrl : this.fileList[0].url.substring(4)
           let parameter = {
-            'hid': this.hid,
-            'hname': values.hname,
-            'description': values.description,
-            'facilities': values.facilities.toString(),
-            'service': values.service.toString(),
+            'rid': this.rid,
+            'rname': values.rname,
+            'people': values.people,
+            'assitions': values.assitions,
+            'cancel': values.cancel,
+            'breakfast': values.breakfast,
+            'price': values.price,
+            'stock': values.stock,
             'type': values.type,
-            'address': values.address,
-            'phone': values.phone,
-            'img': imgUrl,
-            'rate': values.rate
+            'img': imgUrl
           }
-          return updateHotel(parameter).then(res => {
+          return updateRoom(parameter).then(res => {
             if (res.success === true) {
               this.visible = false
               this.confirmLoading = false
               this.$emit('ok', values)
-              this.$message.success('更新酒店成功！')
+              this.$message.success('更新房间成功！')
             } else {
               this.confirmLoading = false
               this.$message.error({
-                message: '更新酒店失败！'
+                message: '更新房间失败！'
               })
             }
           }).catch(err => {
               this.confirmLoading = false
-              this.$message.error(`更新酒店出错！: ${err.message}`)
+              this.$message.error(`更新房间出错！: ${err.message}`)
           }) 
         } else {
             this.confirmLoading = false
         }
       })
     },
-    handleCheckPhone(rule, value, callback) {
-      //验证联系电话
-      if (value!="" && (!(/^1(3|4|5|6|7|8|9)\d{9}$/.test(value)) || /0\\d{2,3}-\\d{7,8}/.test(value))) {
-        callback('请输入正确的联系电话')
+    /* 自定义验证规则 */
+    handleCheckStock(rule, value, callback) {
+      //验证库存只能为非负整数
+      if (value!="" && (!(/^\d+$/.test(value)))) {
+        callback('请输入正确的库存')
+      }
+      callback()
+    },
+    handleCheckPrice(rule, value, callback) {
+      //验证价格只能为非负浮点数
+      if (value!="" && (!(/^\d+(\.\d+)?$/.test(value)))) {
+        callback('请输入正确的的价格')
       }
       callback()
     }

@@ -13,7 +13,7 @@
           <span>用户管理</span>
         </a-menu-item>
         <a-menu-item key="3">
-          <a-icon type="bank" />
+          <a-icon type="home" />
           <span>酒店管理</span>
         </a-menu-item>
       </a-menu>
@@ -33,7 +33,9 @@
       <a-layout-content
         :style="{ margin: '24px 16px', padding: '24px', background: '#fff', minHeight: '732px' }"
       >
+      <keep-alive  include="HotelManage">
         <router-view/>
+      </keep-alive>
       </a-layout-content>
     </a-layout>
   </a-layout>
