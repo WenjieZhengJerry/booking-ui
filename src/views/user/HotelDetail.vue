@@ -13,7 +13,7 @@
                 <a-icon type="right-circle" />
               </div>
               <div>
-                <img src="@/assets/hotel-demo1.jpg" />
+                <img :src="'/api/' + hotel.img" />
               </div>
               <div>
                 <img src="@/assets/hotel-demo2.jpg" />
@@ -80,7 +80,7 @@
           <div class="room-div" v-for="(room, index) in rooms" :key="index">
             <a-row>
               <a-col :span="6">
-                <img src="@/assets/room-demo.jpg" style="width: 250px">
+                <img :src="'/api/' + room.img" style="width: 250px">
                 <div class="room-img-section">
                   {{ room.rname }}
                   <a-tooltip placement="right">

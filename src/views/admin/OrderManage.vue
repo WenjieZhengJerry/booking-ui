@@ -39,22 +39,7 @@
         </a-col>
         <a-col key="5" :span="8" >
           <a-form-item label="酒店名称">
-            <a-select 
-              v-decorator="[
-                'hName',
-                {
-                  initialValue: 'ALL'
-                }
-              ]" style="width: 200px"
-            >
-              <a-select-option value="ALL">全部</a-select-option>
-              <a-select-option value="维也纳国际酒店1">维也纳国际酒店1</a-select-option>
-              <a-select-option value="维也纳国际酒店2">维也纳国际酒店2</a-select-option>
-              <a-select-option value="维也纳国际酒店3">维也纳国际酒店3</a-select-option>
-              <a-select-option value="维也纳国际酒店4">维也纳国际酒店4</a-select-option>
-              <a-select-option value="维也纳国际酒店5">维也纳国际酒店5</a-select-option>
-              <a-select-option value="维也纳国际酒店6">维也纳国际酒店6</a-select-option>
-            </a-select>
+            <a-input v-decorator="['hName']"/>
           </a-form-item>
         </a-col>
         <a-col key="6" :span="8" >
@@ -135,7 +120,7 @@
       :data="loadData"
       :alert="options.alert"
       :rowSelection="options.rowSelection"
-      showPagination="true"
+      showPagination="auto"
     >
       <!--slot卡槽扩展列表：-->
       <!--1.序号-->
