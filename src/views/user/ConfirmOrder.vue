@@ -108,7 +108,7 @@
       <div class="right">
         <div class="section">
           <div class="pic">
-            <img src="@/assets/confirm-order-img-demo.jpg">
+            <img :src="'/api/' + room.img">
           </div>
           <p class="title">{{ hotel.hname }}</p>
           <p class="address">地址：{{ hotel.address }} </p>
