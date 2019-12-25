@@ -169,7 +169,7 @@ export default {
       this.helpText.upassword=null
       this.form.resetFields()
     },
-    notificationParent(){this.$emit('add')},
+    //notificationParent(){this.$emit('add')},
     handleOk(e) {
       const { form: { validateFields } } = this;
       this.form.validateFields({ force: true }, (errors, values) => {

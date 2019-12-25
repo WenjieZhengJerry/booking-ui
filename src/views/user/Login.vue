@@ -48,7 +48,7 @@
             >
               记住我
             </a-checkbox>
-            <a class="login-form-forgot" href="#">
+            <a class="login-form-forgot" @click="handleForgot" href="#">
               忘记密码
             </a>
             <a-button type="primary" html-type="submit" class="login-form-button">
@@ -65,6 +65,7 @@
       </div>
     </div>
   </div>
+  <forgot-password ref="forgotModel"/>
   <!-- 尾部 -->
   <v-footer />
 </div>
@@ -73,19 +74,25 @@
 <script>
 import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
+import ForgotPassword from '@/views/user/ForgotPassword'
 import {getPublicKey, login } from '@/api/login'
-import {rsaEncrypt, setLoginUid, login_uid } from '@/utils/encrypt'
+import {rsaEncrypt, loginUser } from '@/utils/encrypt'
 import {errorTipsMap } from '@/utils/errorTips'
 
 export default {
  name: 'Login',
  components: {
     'v-header': Header,
-    'v-footer': Footer
+    'v-footer': Footer,
+    ForgotPassword
   },
   data () {
     return {
-      img: require('@/assets/background.svg')
+      img: require('@/assets/background.svg'),
+      userInfo:{
+        email:'',
+        upassword:''
+      }
     };
   },
  beforeCreate() {
@@ -96,36 +103,23 @@ export default {
       e.preventDefault();
       this.form.validateFields((err, values) => {
         if (!err) {
-          this.getKey(values.userName, values.password)
+          this.userInfo.email=values.userName
+          this.userInfo.upassword=values.password
+          loginUser(this.userInfo,(status,tips)=>{
+            if(0===status){
+              this.$notification.success({message: tips})
+              this.$router.push({path:'/userCenter'})
+            }
+            else{
+              this.$notification.error({message: tips})
+              console.log(tips)
+            }
+          })
         }
       });
     },
-    getKey (email, password) {
-      return getPublicKey(email).then(res => {
-        if (res.success === true) {
-          password=rsaEncrypt(password, res.data)
-          this.submitInfo({email:email,upassword:password})
-          return
-        }
-        this.$notification.error({message: `登录失败: ${errorTipsMap[res.data]}`})
-      }).catch(ex => {
-          this.$notification.error({message: '请求出现错误，请稍后再试'})
-          console.log('请求出现错误，请稍后再试',ex.message)
-      })
-    },
-    submitInfo (loginInfo) {
-      return login(loginInfo).then(res => {
-        if (res.success === true) {
-          setLoginUid(res.data)
-          this.$router.push({path:'/userCenter'})
-          this.$notification.success({message: '登录成功'})
-          return
-        }
-        this.$notification.error({message: `登录失败: ${errorTipsMap[res.data]}`})
-      }).catch(ex => {
-          this.$notification.error({message: '请求出现错误，请稍后再试'})
-          console.log('请求出现错误，请稍后再试',ex.message)
-      })
+    handleForgot(){
+      this.$refs.forgotModel.show(this.form.getFieldValue('userName'))
     }
   }
 }

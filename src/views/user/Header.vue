@@ -9,15 +9,20 @@
         :style="{ lineHeight: '64px' }"
       >
         <a-menu-item key="1" @click="goToIndex">酒店预订</a-menu-item>
-        <a-button class="header-btn"><router-link to="/register">注册</router-link></a-button>
-        <a-button type="primary" class="header-btn"><router-link to="/login">登录</router-link></a-button>
-        <a-dropdown class="header-dropdown">
-          <a class="ant-dropdown-link" href="#"> 用户名 <a-icon type="down" /> </a>
-          <a-menu slot="overlay">
-            <a-menu-item>
+        <a-button v-if="!is_login" class="header-btn"><router-link to="/register">注册</router-link></a-button>
+        <a-button v-if="!is_login"  type="primary" class="header-btn"><router-link to="/login">登录</router-link></a-button>
+        <a-dropdown v-if="is_login" class="header-dropdown">
+          <a class="ant-dropdown-link" href="#"> 
+            <a-row>
+              <a-col :span="8"><a-avatar shape="square" :size="32" icon="user" :src="'/api'+userInfo.icon"/></a-col>
+              <a-col :span="16">{{userInfo.uname}} <a-icon type="down" /> </a-col>
+            </a-row>
+          </a>
+          <a-menu slot="overlay" >
+            <a-menu-item key="userCenter">
               <router-link to="/userCenter">个人中心</router-link>
             </a-menu-item>
-            <a-menu-item>
+            <a-menu-item key="exit" @click="exit">
               <a href="javascript:;">退出登录</a>
             </a-menu-item>
           </a-menu>
@@ -27,18 +32,50 @@
 </template>
 
 <script>
+import { errorTipsMap } from '@/utils/errorTips'
+import { isLogin, logout } from '@/api/login'
 export default {
  name: 'Header',
  data () {
     return {
-
-    };
+      is_login:false,
+      userInfo:{}
+    }
  },
- methods: {
-   goToIndex: function() {
-     this.$router.push('/')
-   }
- }
+  methods: {
+    goToIndex: function() {
+      this.$router.push('/')
+    },
+    exit(item){
+      logout().then(res => {
+        if (res.success === true) {
+          this.$router.push('/login')
+          return
+        }
+        console.log('logout error',errorTipsMap[res.data])
+      }).catch(ex => {
+        console.log('logout error',ex.message)
+      })
+    }
+  },
+  created () {
+    isLogin().then(res => {
+      if (res.success === true) {
+        if(null!==res.data){
+          this.userInfo=res.data
+          this.is_login=true
+          return
+        }
+      }
+      this.is_login=false
+      console.log('isLogin error',errorTipsMap[res.data])
+    }).catch(ex => {
+      console.log('isLogin error',ex.message)
+    })
+  },
+  beforeUpdate(){
+    alert("beforeUpdate Header")
+  }
 }
 
 </script>

@@ -92,7 +92,7 @@ import Ellipsis from '@/components/Ellipsis'
 import UserCheck from './form/UserCheck'
 import UserSearch from './form/UserSearch'
 import UserAdd from './form/UserAdd'
-import { getUsers, deleteUser, deleteUserBatch, updateUser, updateUserBatch } from '@/api/user'
+import { getUsers, deleteUser, deleteUserBatch, updateUser, updateUserStatusBatch } from '@/api/user'
 import { parsePage } from '@/utils/pageable'
 import {errorTipsMap } from '@/utils/errorTips'
 const userTypeMap = {
@@ -248,7 +248,7 @@ export default {
       updateUser(record).then(res => {
         if (res.success === true) {
           this.$notification.success({message: '更新成功'})
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
           return
         }
         this.$notification.error({message: `更新失败: ${errorTipsMap[res.data]}`})
@@ -274,13 +274,14 @@ export default {
       }
     },
     changeStatusBatch (newEnable, records) {
-      records.forEach(element => {
-        element.enable=newEnable;
-      });
-      updateUserBatch(records).then(res => {
+      let uids=[]
+      for(let len=records.length-1;len>=0;len--){
+        uids.push(records[len].uid)
+      }
+      updateUserStatusBatch(uids,{status:newEnable}).then(res => {
         if (res.success === true) {
           this.$notification.success({message: '更新成功'})
-          this.$refs.table.refresh(true)
+          this.$refs.table.refresh()
           return
         }
         this.$notification.error({message: `更新失败: ${errorTipsMap[res.data]}`})

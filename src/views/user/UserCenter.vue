@@ -2,7 +2,7 @@
 <a-locale-provider :locale="zh_CN">
   <a-layout id="components-layout-demo-fixed">
     <!-- 头部 -->
-    <v-header />
+    <v-header/>
     <a-layout-content :style="{ padding: '0 50px', marginTop: '90px' }">
       <a-layout style="padding: 24px 0; background: #fff">
         <a-layout-sider width="200" style="background: #fff">
@@ -43,7 +43,8 @@
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import Header from './Header'
 import Footer from './Footer'
-
+import { errorTipsMap } from '@/utils/errorTips'
+import { isLogin, logout } from '@/api/login'
 export default {
  name: 'UserCenter',
  components: {
@@ -53,7 +54,8 @@ export default {
  data () {
   return {
     zh_CN,
-    selectedKey: '2'
+    selectedKey: '2',
+    userInfo:{}
   };
  },
  methods: {
@@ -76,7 +78,20 @@ export default {
         break;
      }
    }
- }
+ },
+  created () {
+    isLogin().then(res => {
+      if (res.success === true) {
+        if(null!==res.data){
+          this.userInfo=res.data
+          return
+        }
+      }
+      console.log('isLogin error',errorTipsMap[res.data])
+    }).catch(ex => {
+      console.log('isLogin error',ex.message)
+    })
+  }
 }
 
 </script>

@@ -200,7 +200,6 @@ export default {
           this.userInfo.email=values.email
           this.userInfo.upassword=values.password
           registerUser(this.userInfo,this.captchaInfo,(status,tips)=>{
-            // this.confirmLoading = false
             if(0===status){
               this.$notification.success({message: tips})
               this.$router.push({path:'/login'})
@@ -210,34 +209,9 @@ export default {
               console.log(tips)
             }
           })
-          //this.getKey (values.email, values.password)
         }
       })
     },
-    // getKey (email, password) {
-    //   return getPublicKey(email).then(res => {
-    //     if (res.success === true) {
-    //       this.userInfo.upassword=rsaEncrypt(password, res.data)
-    //       this.submitInfo(this.userInfo,this.captchaInfo)
-    //       return
-    //     }
-    //       this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
-    //   }).catch(ex => {
-    //     this.requestFailed(ex)
-    //   })
-    // },
-    // submitInfo (info,token) {
-    //   register(info,token).then(res => {
-    //     if (res.success === true) {
-    //       this.$notification.success({message: '注册成功'})
-    //       this.$router.push({path:'/login'})
-    //       return
-    //     }
-    //     this.$notification.error({message: `注册失败: ${errorTipsMap[res.data]}`})
-    //   }).catch(ex => {
-    //     this.requestFailed(ex)
-    //   })
-    // },
     getCaptcha (e) {
       e.preventDefault()
       const { form: { validateFields }, state, $message, $notification } = this

@@ -22,11 +22,14 @@
       <a-layout-header style="background: #fff; padding: 0">
         <a-dropdown style="float: right;">
           <a class="ant-dropdown-link" href="#" style="margin-right: 16px;">
-             <a-avatar :src="avatarImg" /> {{ uName }} <a-icon type="down" /> 
+            <a-row>
+              <a-col :span="7"><a-avatar shape="square" :size="32" icon="user" :src="avatarImg"/></a-col>
+              <a-col :span="17">{{userInfo.uname}} <a-icon type="down" /> </a-col>
+            </a-row>
           </a>
           <a-menu slot="overlay">
             <a-menu-item key="1"><router-link to="/login"><a-icon type="swap" />切换账号</router-link></a-menu-item>
-            <a-menu-item key="2"><router-link to="/"><a-icon type="logout" />退出</router-link></a-menu-item>
+            <a-menu-item key="2" @click="exit"><a href="javascript:;"><a-icon type="logout" /> 退出</a></a-menu-item>
           </a-menu>
         </a-dropdown>
       </a-layout-header>
@@ -35,20 +38,22 @@
       >
       <keep-alive  include="HotelManage">
         <router-view/>
-      </keep-alive>
+	</keep-alive>
       </a-layout-content>
     </a-layout>
   </a-layout>
 </template>
 
 <script>
-
+import { isLogin, logout } from '@/api/login'
+import { errorTipsMap } from '@/utils/errorTips'
 export default {
  name: 'Home',
  data () {
     return {
       uName: '小泽又沐风',
-      avatarImg: require('@/assets/user-img-demo.jpg'),
+      avatarImg: '/api/upload/user/avatar/default_avatar.jpeg',
+      userInfo:{}
    };
  },
  methods: {
@@ -64,8 +69,37 @@ export default {
         this.$router.push('/admin/hotelManage')
         break;
      }
+   },
+   exit(){
+    logout().then(res => {
+        if (res.success === true) {
+          this.$router.push('/')
+          return
+        }
+        console.log('logout error',errorTipsMap[res.data])
+      }).catch(ex => {
+        console.log('logout error',ex.message)
+      })
    }
- }
+ },
+  created () {
+    isLogin().then(res => {
+      if (res.success === true) {
+        if(null!==res.data){
+          this.userInfo=res.data
+          this.uName=res.data.uName
+          this.avatarImg='/api'+res.data.icon
+          if(1===res.data.type){
+            return
+          }
+        }
+        this.$router.push('/userCenter')
+      }
+      console.log('isLogin error',errorTipsMap[res.data])
+    }).catch(ex => {
+      console.log('isLogin error',ex.message)
+    })
+  }
 }
 
 </script>

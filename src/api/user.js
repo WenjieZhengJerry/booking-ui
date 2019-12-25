@@ -32,10 +32,11 @@ export function updateUser (parameter) {
 }
 
 // 批量更新用户 
-export function updateUserBatch (parameter) {
+export function updateUserStatusBatch (parameter, status) {
   return axios({
     url: `${api.user}`, 
     method: 'put',
+    headers:status,
     data: parameter
   })
 }

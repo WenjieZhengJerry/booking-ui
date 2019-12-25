@@ -5,40 +5,88 @@
       <h4>基本信息</h4>
     </div>
     <div class="section">
-      <ul>
+      <a-row>
+        <a-col :span="8">
+          <a-row style="margin-top:50px;margin-bottom:20px;" type="flex" justify="space-around" align="middle">
+            <a-avatar shape="square" :size="128" icon="user" :src="'/api'+userInfo.icon"/>
+          </a-row>
+          <a-row v-if="isEdit" type="flex" justify="space-around" align="middle">
+            <a-upload name="file" :multiple="true" action="//jsonplaceholder.typicode.com/posts/" :headers="headers" @change="handleChange">
+              <a-button>
+                <a-icon type="upload" /> 修改头像
+              </a-button>
+            </a-upload>
+          </a-row>
+        </a-col>
+        <a-col :span="16">
+          <a-row style="margin-top:50px;">
+            <a-col :span="4" class="label-name">用户名:</a-col>
+            <a-col :span="16">
+              <p v-if="!isEdit" style="margin-top:4px">{{ userInfo.uname }}</p>
+              <a-input v-else placeholder="用户名" v-model="userInfo.uname"/>
+            </a-col>
+          </a-row>
+          <a-row style="margin-top:15px;">
+            <a-col :span="4" class="label-name">邮箱：</a-col>
+            <a-col :span="16">
+              <p v-if="!isEdit" style="margin-top:4px">{{ userInfo.email }}</p>
+              <a-input v-else placeholder="邮箱" v-model="userInfo.email" maxlength="18"/>
+            </a-col>
+          </a-row>
+          <a-row style="margin-top:15px;">
+            <a-col :span="4" class="label-name">手机：</a-col>
+            <a-col :span="16">
+              <p v-if="!isEdit" style="margin-top:4px">{{ userInfo.telephone }}</p>
+              <a-input v-else placeholder="仅大陆手机号码" v-model="userInfo.telephone" maxlength="11"/>
+            </a-col>
+          </a-row>
+          <a-row style="margin-top:15px;">   
+            <a-col :span="4" class="label-name">账号类型：</a-col>
+            <a-col :span="16">
+              <p v-if="!isEdit" style="margin-top:4px">{{ userInfo.type|typeFilter }}</p>
+              <a-input v-else :disabled="true" placeholder="账号类型"/>
+            </a-col>
+          </a-row>
+          <a-row style="margin-top:15px;">   
+            <a-col :span="4" class="label-name">账号状态：</a-col>
+            <a-col :span="16">
+              <p v-if="!isEdit" style="margin-top:4px">{{ userInfo.enable|statusFilter }}</p>
+              <a-input v-else :disabled="true" placeholder="账号状态"/>
+            </a-col>
+          </a-row>
+        </a-col>
+      </a-row>
+       
+      <!-- <ul>
         <li>
-          <label>姓名：</label>
-          <p v-if="!isEdit">{{ user.uName }}</p>
-          <a-input v-else placeholder="真实姓名" v-model="user.uName" style="width: 30%"/>
-        </li>
-        <li>
-          <label>证件类型：</label>
-          <p v-if="!isEdit">{{ user.idType }}</p>
-          <a-select v-else defaultValue="IDcard" style="width: 120px">
-            <a-select-option value="IDcard">身份证</a-select-option>
-          </a-select>
-        </li>
-        <li>
-          <label>证件号：</label>
-          <p v-if="!isEdit">{{ user.idNumber }}</p>
-          <a-input v-else placeholder="身份证号码" v-model="user.idNumber" style="width: 30%" maxlength="18"/>
-        </li>
-        <li>
-          <label>手机：</label>
-          <p v-if="!isEdit">{{ user.phone }}</p>
-          <a-input v-else placeholder="仅大陆手机号码" v-model="user.phone" style="width: 30%" maxlength="11"/>
+          <label>用户名：</label>
+          <p v-if="!isEdit">{{ userInfo.uname }}</p>
+          <a-input v-else placeholder="用户名" v-model="userInfo.uname" style="width: 30%"/>
         </li>
         <li>
           <label>邮箱：</label>
-          <p v-if="!isEdit">{{ user.email }}</p>
-          <a-input v-else placeholder="邮箱" v-model="user.email" style="width: 30%"/>
+          <p v-if="!isEdit">{{ userInfo.email }}</p>
+          <a-input v-else placeholder="邮箱" v-model="userInfo.email" style="width: 30%" maxlength="18"/>
         </li>
         <li>
-          <label>生日：</label>
-          <p v-if="!isEdit">{{ user.birthday }}</p>
-          <a-date-picker v-else :defaultValue="moment(user.birthday, 'YYYY-MM-DD')" />
+          <label>手机：</label>
+          <p v-if="!isEdit">{{ userInfo.telephone }}</p>
+          <a-input v-else placeholder="仅大陆手机号码" v-model="userInfo.telephone" style="width: 30%" maxlength="11"/>
         </li>
-      </ul>
+        <li>
+          <label>账号类型：</label>
+          <p v-if="!isEdit">{{ userInfo.type|typeFilter }}</p>
+          <a-input v-else :disabled="true" placeholder="账号类型" style="width: 30%"/>
+        </li>
+        <li>
+          <label>账号状态：</label>
+          <p v-if="!isEdit">{{ userInfo.enable|statusFilter }}</p>
+          <a-input v-else :disabled="true" placeholder="账号状态" style="width: 30%"/>
+        </li>
+      </ul> 
+      <ul>
+        <a-avatar shape="square" :size="128" icon="user" :src="'/api'+userInfo.icon"/>
+      </ul> -->
       <div class="btn-box">
         <a-button v-if="isEdit" class="btn" @click="handleCancel">取消</a-button>
         <a-button v-if="isEdit" class="btn" type="primary" @click="handleSave">保存</a-button>
@@ -52,20 +100,37 @@
 <script>
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import moment from 'moment';
-
+import { errorTipsMap } from '@/utils/errorTips'
+import { isLogin } from '@/api/login'
+const userTypeMap = {
+  '0': {
+    text: '普通用户'
+  },
+  '1': {
+    text: '管理员'
+  }
+}
+const userStatusMap = {
+  true: {
+    text: '启用'
+  },
+  false: {
+    text: '停用'
+  }
+}
 export default {
  name: 'UserInfomation',
  data () {
   return {
     zh_CN,
     isEdit: false,
-    user: {
-      uName: '小泽又沐风',
-      idType: '身份证',
-      idNumber: '440000201911230000',
-      phone: '12345678910',
-      email: '987654321@qq.com',
-      birthday: '2019-11-23'
+    userInfo: {
+      uname: '',
+      telephone: '',
+      email: '',
+      type: 0,
+      icon: '/api/upload/user/avatar/default_avatar.jpeg',
+      enable: true
     }
   };
  },
@@ -80,6 +145,28 @@ export default {
     },
     handleEdit: function() {
       this.isEdit = true
+    }
+  },
+  created () {
+    isLogin().then(res => {
+      if (res.success === true) {
+        if(null!==res.data){
+          this.userInfo=res.data
+          return
+        }
+        this.$router.push('/login')
+      }
+      console.log('isLogin error',errorTipsMap[res.data])
+    }).catch(ex => {
+      console.log('isLogin error',ex.message)
+    })
+  },
+  filters: {
+    typeFilter (type) {
+      return userTypeMap[type].text
+    },
+    statusFilter (type) {
+      return userStatusMap[type].text
     }
   }
 }
@@ -148,6 +235,12 @@ export default {
 .section .btn-box .btn {
   float: right;
   margin-left: 10px;
+}
+
+.label-name{
+  margin-top:5px;
+  margin-right:5px;
+  text-align:right;
 }
 
 </style>
