@@ -92,7 +92,7 @@ export default {
           this.confirmLoading = false
           if (res.success === true) {
             this.init()
-            this.$notification.success({message: `找回信息已发送到邮箱: ${this.email}`})
+            this.$notification.success({message: `找回信息已发送到邮箱: ${values.email}`})
             this.visible = false
             return
           }

@@ -85,7 +85,18 @@ export default {
       this.userInfo=user_info
       return
     }
-    this.$router.push('/login')
+    isLogin().then(res => {
+      if (res.success === true) {
+        this.userInfo=res.data
+        setUserInfo(res.data)
+        return
+      }
+      console.log('isLogin error',errorTipsMap[res.data])
+      this.userInfo=null
+      this.$router.push('/login')
+    }).catch(ex => {
+      console.log('isLogin error',ex.message)
+    })
   }
 }
 
