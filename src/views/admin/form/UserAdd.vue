@@ -40,11 +40,10 @@
       label="密码"
       :label-col="{ span: 5 }"
       :wrapper-col="{ span: 12 }"
-      has-feedback
       :validate-status="validateSta.upassword"
       :help="helpText.upassword"
       >
-        <a-input
+        <a-input-password
         type="password"
         v-decorator="[
           'upassword',
@@ -56,10 +55,9 @@
       label="确认密码"
       :label-col="{ span: 5 }"
       :wrapper-col="{ span: 12 }"
-      has-feedback
       :validate-status="validateSta.confirm"
       >
-        <a-input
+        <a-input-password
         type="password"
         v-decorator="[
           'confirm',
@@ -180,6 +178,7 @@ export default {
         this.userInfo.upassword=values.upassword
         this.userInfo.uname=values.uname
         this.userInfo.telephone=values.telephone
+        this.captchaInfo.code=values.captcha
         this.confirmLoading = true
         registerUser(this.userInfo,this.captchaInfo,(status,tips)=>{
           this.confirmLoading = false
@@ -264,20 +263,19 @@ export default {
           }
         }, 1000)
 
-        this.hideMessage = $message.loading('验证码发送中..', 0)
+        this.getCaptchaStatus.hideMessage = $message.loading('验证码发送中..', 0)
 
         sendCaptcha(values.email).then(res => { // 获取验证码
-          setTimeout(this.hideMessage)
+          setTimeout(this.getCaptchaStatus.hideMessage)
           if (res.success === true) {
-            this.captchaInfo.token=res.data.token
-            this.captchaInfo.code=res.data.code
-            alert(res.data.code)
-            this.$notification.success({message: '验证码已发送'})
+            this.captchaInfo=res.data
+            this.$notification.success({message: `验证码已发送到邮箱: ${values.email}`})
+            //alert(res.data.code)
             return
           }
           this.$notification.error({message: `验证码发送失败: ${errorTipsMap[res.data]}`})
         }).catch(ex => {
-          setTimeout(this.hideMessage)
+          setTimeout(this.getCaptchaStatus.hideMessage)
           this.$notification.error({message: '请求出现错误，请稍后再试'})
           console.log('请求出现错误，请稍后再试',ex.message)
         })

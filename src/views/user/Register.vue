@@ -19,23 +19,23 @@
           </a-form-item>
 
           <a-form-item>
-            <a-input
+            <a-input-password
               size="large"
               type="password"
               autocomplete="false"
               placeholder="至少6位密码，区分大小写"
               v-decorator="['password', {rules: [{ required: true, message: '至少6位密码，区分大小写'}, { validator: this.handlePasswordLevel }], validateTrigger: ['change', 'blur']}]"
-            ></a-input>
+            ></a-input-password>
           </a-form-item>
 
           <a-form-item>
-            <a-input
+            <a-input-password
               size="large"
               type="password"
               autocomplete="false"
               placeholder="确认密码"
               v-decorator="['password2', {rules: [{ required: true, message: '至少6位密码，区分大小写' }, { validator: this.handlePasswordCheck }], validateTrigger: ['change', 'blur']}]"
-            ></a-input>
+            ></a-input-password>
           </a-form-item>
 
           <a-row :gutter="16">
@@ -241,7 +241,7 @@ export default {
         if (res.success === true) {
           this.captchaInfo.token=res.data.token
           this.captchaInfo.code=res.data.code
-          alert(res.data.code)
+          //alert(res.data.code)
           this.$notification.success({message: `验证码已发送到邮箱: ${email}`})
           return
         }

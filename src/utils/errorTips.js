@@ -4,6 +4,7 @@ export const errorTipsMap={
     'user_disable':'账号已停用',
     'time_out':'超时, 请刷新重试',
     'user_existed':'用户已存在',
+    'email_existed':'邮箱已被使用',
     'captcha_error':'验证码错误',
     'captcha_expired':'验证码过期',
     'password_error':'密码错误',

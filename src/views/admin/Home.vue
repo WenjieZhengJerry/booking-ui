@@ -33,7 +33,8 @@
           </a>
           <a-menu slot="overlay">
             <a-menu-item key="1"><router-link to="/login"><a-icon type="swap" />切换账号</router-link></a-menu-item>
-            <a-menu-item key="2" @click="exit"><a href="javascript:;"><a-icon type="logout" /> 退出</a></a-menu-item>
+            <a-menu-item key="2"><router-link to="/userCenter"><a-icon type="user" />个人中心</router-link></a-menu-item>
+            <a-menu-item key="3" @click="exit"><a href="javascript:;"><a-icon type="logout" /> 退出</a></a-menu-item>
           </a-menu>
         </a-dropdown>
       </a-layout-header>
