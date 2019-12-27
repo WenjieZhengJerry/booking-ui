@@ -117,7 +117,6 @@ export default {
   name:'UserAdd',
   data() {
     return {
-      ModalText: 'Content of the modal',
       visible: false,
       confirmLoading: false,
       formLayout: 'horizontal',
@@ -128,7 +127,7 @@ export default {
       },
       disableGetCaptcha: false,
       getCaptchaTest: '获取验证码',
-      captchaInfo:{
+      captchaInfo:{   //验证码信息
         token:'',
         code:''
       },
@@ -140,7 +139,7 @@ export default {
       helpText:{
         upassword:null
       },
-      userInfo:{
+      userInfo:{  //用户信息
         email:'',
         upassword:'',
         telephone:'',
@@ -156,7 +155,7 @@ export default {
     hide(){
       this.visible = false
     },
-    init(){
+    init(){ //  重置表单
       this.userInfo.email=''
       this.userInfo.upassword=''
       this.userInfo.telephone=''
@@ -170,7 +169,7 @@ export default {
       this.form.resetFields()
     },
     //notificationParent(){this.$emit('add')},
-    handleOk(e) {
+    handleOk(e) { //  提交表单
       const { form: { validateFields } } = this;
       this.form.validateFields({ force: true }, (errors, values) => {
         if (errors) {
@@ -198,10 +197,10 @@ export default {
         })
       });
     },
-    handleCancel(e) {
+    handleCancel(e) { //  取消按钮
       this.visible = false
     },
-    handleValidUpassword (rule, value, callback) {
+    handleValidUpassword (rule, value, callback) {  //  验证密码
       //长度要在6~18之间
       if(/\S{6,18}$/.test(value)){
         //只能以字母开头的数字大小写字母
@@ -229,7 +228,7 @@ export default {
         callback('密码长度要在6~18之间')
       }
     }, 
-    handleValidConfirm (rule, value, callback) {
+    handleValidConfirm (rule, value, callback) {  //  验证确认密码
       if (value && value !== this.form.getFieldValue('upassword')) {
         this.validateSta.confirm='error'
         callback('输入密码不一致!');
@@ -238,7 +237,7 @@ export default {
         callback();
       }
     },
-    handleValidCaptcha(rule, value, callback){
+    handleValidCaptcha(rule, value, callback){  //  验证验证码
       if (undefined===value) {
         callback('请输入验证码')
       }
@@ -250,7 +249,7 @@ export default {
       }
       callback()
     },
-    getCaptcha(){
+    getCaptcha(){ // 获取验证码
       const { form: { validateFields }, $message} = this;
       this.form.validateFields(['email'],(errors, values) => {
         if (errors) {
@@ -267,7 +266,7 @@ export default {
 
         this.hideMessage = $message.loading('验证码发送中..', 0)
 
-        sendCaptcha(values.email).then(res => {
+        sendCaptcha(values.email).then(res => { // 获取验证码
           setTimeout(this.hideMessage)
           if (res.success === true) {
             this.captchaInfo.token=res.data.token

@@ -247,6 +247,8 @@ export default {
         }
         this.$notification.error({message: `验证码发送失败: ${errorTipsMap[res.data]}`})
       }).catch(ex => {
+        setTimeout(this.hide)
+        console.log('请求出现错误，请稍后再试',ex.message)
         this.requestFailed(ex)
       })
     },

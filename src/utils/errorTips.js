@@ -8,6 +8,7 @@ export const errorTipsMap={
     'captcha_expired':'验证码过期',
     'password_error':'密码错误',
     'empty_info':'账号或密码为空',
-    'user_not_login':'用户未登录'
+    'user_not_login':'用户未登录',
+    'change_self':'更改或删除自身账号'
 }
 
