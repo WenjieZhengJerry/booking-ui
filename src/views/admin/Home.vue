@@ -16,6 +16,10 @@
           <a-icon type="home" />
           <span>酒店管理</span>
         </a-menu-item>
+        <a-menu-item key="4">
+          <a-icon type="message" />
+          <span>评论管理</span>
+        </a-menu-item>
       </a-menu>
     </a-layout-sider>
     <a-layout>
@@ -67,6 +71,9 @@ export default {
         break;
       case '3':
         this.$router.push('/admin/hotelManage')
+        break;
+      case '4':
+        this.$router.push('/admin/commentManage')
         break;
      }
    },
