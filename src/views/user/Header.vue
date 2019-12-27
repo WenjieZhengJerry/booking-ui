@@ -14,16 +14,21 @@
         <a-dropdown v-if="is_login" class="header-dropdown">
           <a class="ant-dropdown-link" href="#"> 
             <a-row>
-              <a-col :span="8"><a-avatar shape="square" :size="32" icon="user" :src="'/api'+userInfo.icon"/></a-col>
+              <a-col :span="8">
+                <a-avatar shape="square" :size="32" icon="user" :src="'/api'+userInfo.icon"/>
+                </a-col>
               <a-col :span="16">{{userInfo.uname}} <a-icon type="down" /> </a-col>
             </a-row>
           </a>
           <a-menu slot="overlay" >
             <a-menu-item key="userCenter">
-              <router-link to="/userCenter">个人中心</router-link>
+              <router-link to="/userCenter"><a-icon type="user" /> 个人中心</router-link>
+            </a-menu-item>
+            <a-menu-item v-if="is_login&&1===userInfo.type" key="admin">
+              <router-link to="/admin"><a-icon type="audit" /> 后台管理</router-link>
             </a-menu-item>
             <a-menu-item key="exit" @click="exit">
-              <a href="javascript:;">退出登录</a>
+              <a href="javascript:;"><a-icon type="logout" /> 退出登录</a>
             </a-menu-item>
           </a-menu>
         </a-dropdown>

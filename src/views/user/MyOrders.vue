@@ -89,6 +89,7 @@ import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import { getMyOrders, getAOrder, deleteOrder } from '@/api/order'
 import { getHotelDetail } from '@/api/hotel'
 import EvaluateOrder from './EvaluateOrder'
+import { user_info } from '@/utils/encrypt'
 
 const orderStatusMap = {
   UNPAY: {
@@ -156,7 +157,7 @@ export default {
  },
  methods: {
    loadingData: function() {
-     let uid = 1
+     let uid = user_info.uid
      getMyOrders(uid, this.status).then(res => {
        if (res.success == true) {
          this.orders = res.data
