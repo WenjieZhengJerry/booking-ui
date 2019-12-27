@@ -6,25 +6,6 @@
     <v-header />
     <!-- 高级查询 -->
     <a-layout-content :style="{ padding: '0 50px', marginTop: '64px' }">
-      <a-row class="side-search">
-        <a-col :span="6">
-          <label>目的地</label>
-          <a-input placeholder="城市" :style="{ width: '50%' }" />
-        </a-col>
-        <a-col :span="8">
-          <label>日期</label>
-          <a-range-picker />
-        </a-col>
-        <a-col :span="7">
-          <label>关键词</label>
-          <a-input placeholder="酒店名" :style="{ width: '80%' }" />
-        </a-col>
-        <a-col :span="3">
-          <a-button type="primary" :style="{ width: '70%', float: 'right' }">
-            搜索
-          </a-button>
-        </a-col>
-      </a-row>
       <!-- 多选 -->
       <div class="select-div">
         <div class="row-div">
@@ -35,9 +16,12 @@
                   <a-radio-button value="不限" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">不限</a-radio-button>
                 </a-col>
                 <a-col :span="20">
-                  <template v-for="location in locations">
-                    <a-col :span="3" :key="location">
-                      <a-radio-button :value="location" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">{{ location }}</a-radio-button>
+                  <template v-for="(location, index) in locations">
+                    <a-col :span="3" :key="index">
+                      <a-radio-button :value="location" 
+                        :style="{ border: 0, borderRadius: 0, zIndex: 0 }">
+                        {{ location }}
+                      </a-radio-button>
                     </a-col>
                   </template>
                 </a-col>
@@ -54,8 +38,8 @@
                     </a-radio-group>
                   </a-col>
                   <a-col :span="20">
-                    <template v-for="brand in brands">
-                      <a-col :span="4" :key="brand">
+                    <template v-for="(brand, index) in brands">
+                      <a-col :span="4" :key="index">
                         <a-checkbox :value="brand">{{ brand }}</a-checkbox>
                       </a-col>
                     </template>
@@ -65,7 +49,7 @@
         </div>
         <div class="row-div">
           <a-row>
-              <a-col :span="2" :style="{ lineHeight: '32px' }"><label>星级</label></a-col>
+              <a-col :span="2" :style="{ lineHeight: '32px' }"><label>类型</label></a-col>
               <a-checkbox-group v-model="rateNums" @change="rateChange" :style="{ width: '90%' }">
                   <a-col :span="2">
                     <a-radio-group v-model="rateDefault" @change="changeRateRadio" buttonStyle="solid">
@@ -73,8 +57,8 @@
                     </a-radio-group>
                   </a-col>
                   <a-col :span="20">
-                    <template v-for="rate in rates">
-                      <a-col :span="4" :key="rate">
+                    <template v-for="(rate, index) in rates">
+                      <a-col :span="4" :key="index">
                         <a-checkbox :value="rate">{{ rate }}</a-checkbox>
                       </a-col>
                     </template>
@@ -100,7 +84,7 @@
                       <label>价格区间</label>&nbsp;&nbsp;
                       <a-input-number v-model="minPrice" :min="0" :max="9999" />
                       -
-                      <a-input-number v-model="maxPrice" :min="100" :max="9999" />
+                      <a-input-number v-model="maxPrice" :min="10" :max="9999" />
                       &nbsp;&nbsp;
                       <a-button @click="searchPrice">确定</a-button>
                     </a-col>
@@ -109,6 +93,31 @@
             </a-row>
         </div>
       </div>
+      <!-- 搜索关键词 -->
+      <a-row class="side-search">
+        <a-col :span="6">
+          <label>目的地</label>
+          <a-input v-model="address" allowClear placeholder="酒店地址" :style="{ width: '80%' }" />
+        </a-col>
+        <!-- <a-col :span="8">
+          <label>日期</label>
+          <a-range-picker />
+        </a-col> -->
+        <a-col :span="5">
+          <label>酒店名称</label>
+          <a-input v-model="hName" allowClear placeholder="酒店名称" :style="{ width: '70%' }" />
+        </a-col>
+        <a-col :span="2">
+          <a-button @click="loadHotel" type="primary" :style="{ width: '85%' }" :loading="isLoading">
+            搜索
+          </a-button>
+        </a-col>
+        <a-col :span="2">
+          <a-button @click="handleResetSearch" type="default" :style="{ width: '60%' }" >
+            重置
+          </a-button>
+        </a-col>
+      </a-row>
       <!-- 内容 -->
       <div class="content-div">
         <a-row>
@@ -126,39 +135,44 @@
             </div>
             <div class="sort-div">
               <label>排序：</label>
-              <a-radio-group defaultValue="1" buttonStyle="solid">
-                <a-radio-button value="1" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">默认排序</a-radio-button>
-                <a-radio-button value="2" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">价格升序<a-icon type="arrow-up" /></a-radio-button>
-                <a-radio-button value="3" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">价格降序<a-icon type="arrow-down" /></a-radio-button>
+              <a-radio-group @change="handleSort" defaultValue="1" buttonStyle="solid">
+                <a-radio-button value="1" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">评分最高</a-radio-button>
+                <a-radio-button value="2" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">评分最低</a-radio-button>
+                <a-radio-button value="3" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">价格升序<a-icon type="arrow-up" /></a-radio-button>
+                <a-radio-button value="4" :style="{ border: 0, borderRadius: 0, zIndex: 0 }">价格降序<a-icon type="arrow-down" /></a-radio-button>
               </a-radio-group>
             </div> 
             <div v-if="hotels.length != 0">
-              <template v-for="(hotel, index) in hotels">
-                <div class="hotel-div" :key="index">
-                  <div class="pic">
-                    <a href="javascript:;" @click="goTo(hotel.hid)"><img style="width: 100%; height: 100%" :src="'/api/' + hotel.img" /></a>
-                  </div>
-                  <div class="middle">
-                    <p class="h-name"><a href="javascript:;" @click="goTo(hotel.hid)">{{ hotel.hname }}</a></p>
-                    <p>地址：{{ hotel.address }}</p>
-                    <!-- <p>距离市中心 {{ hotel.distance }} km</p> -->
-                    <a-tag color="blue">{{ hotel.type | hotelTypeFilter }}</a-tag>
-                    <div :style="{ color: '#bdbdbd', marginTop: '10px' }">
-                      <template v-for="service in hotel.service.split(',')">
-                        <a-icon :key="service" :type="service | serviceFilter" /> {{ service }} &nbsp;
-                      </template>
+              <a-spin :spinning="isLoading">
+                <template v-for="(hotel, index) in hotels">
+                  <div class="hotel-div" :key="index">
+                    <div class="pic">
+                      <a href="javascript:;" @click="goTo(hotel.hid)"><img style="width: 100%; height: 100%" :src="'/api/' + hotel.img" /></a>
                     </div>
-                  </div>
-                  <div class="rate">
-                    <span class="ant-rate-text"><span class="score">{{ hotel.rate }}</span>/5分</span>
-                    <a-rate :defaultValue="hotel.rate" allowHalf disabled />
-                  </div>
-                  <div class="more">
-                    ￥<span class="price">{{ hotel.landprice }}</span>起
-                    <a-button @click="goTo(hotel.hid)" class="detail-btn">查看详情</a-button>
-                  </div>
-                </div>  
-              </template> 
+                    <div class="middle">
+                      <p class="h-name">
+                        <a href="javascript:;" @click="goTo(hotel.hid)"> {{ hotel.hname }} · {{ hotel.brand }}</a>
+                      </p>
+                      <p>地址：{{ hotel.address }}</p>
+                      <!-- <p>距离市中心 {{ hotel.distance }} km</p> -->
+                      <a-tag color="blue">{{ hotel.type | hotelTypeFilter }}</a-tag>
+                      <div :style="{ color: '#bdbdbd', marginTop: '10px' }">
+                        <template v-for="service in hotel.service.split(',')">
+                          <a-icon :key="service" :type="service | serviceFilter" /> {{ service }} &nbsp;
+                        </template>
+                      </div>
+                    </div>
+                    <div class="rate">
+                      <span class="ant-rate-text"><span class="score">{{ hotel.rate }}</span>/5分</span>
+                      <a-rate :defaultValue="hotel.rate" allowHalf disabled />
+                    </div>
+                    <div class="more">
+                      ￥<span class="price">{{ hotel.landprice }}</span>起
+                      <a-button @click="goTo(hotel.hid)" class="detail-btn">查看详情</a-button>
+                    </div>
+                  </div>  
+                </template> 
+              </a-spin>
             </div>
             <div v-else>
               <a-empty description="找不到符合条件的酒店" :style="{ margin: '20px 0' }" />
@@ -195,7 +209,43 @@
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
-import { getHotelList, getHotelDetail } from '@/api/hotel'
+import { getHotelList, getHotelDetail, getBrand, findByQuery } from '@/api/hotel'
+
+const locationMap = {
+  '商圈/地标': {
+    text: 'LANDMARK'
+  },
+  '机场/火车站': {
+    text: 'AIRPORT'
+  },
+  '轨道交通': {
+    text: 'TRANSPRORTATION'
+  },
+  '行政区': {
+    text: 'ADMINISTRATIVE'
+  },
+  '景点': {
+    text: 'VIEWPOINT'
+  }
+}
+
+const ratesMap = {
+  '公寓': {
+    text: 'APARTMENT'
+  },
+  '民宿': {
+    text: 'HOMESTAY'
+  },
+  '青旅': {
+    text: 'HOSTEL'
+  },
+  '经济连锁': {
+    text: 'ECONOMY'
+  },
+  '高级连锁': {
+    text: 'HIGNEND'
+  }
+}
 
 const hotelTypesMap = {
   APARTMENT: {
@@ -234,6 +284,7 @@ export default {
   name: 'Home',
   created: function() {
     this.loadHotel()
+    this.getBrand()
   },
   filters: {
     hotelTypeFilter (type) {
@@ -241,15 +292,22 @@ export default {
     },
     serviceFilter (service) {
       return serviceMap[service].icon
+    },
+    locationFilter (type) {
+      return locationMap[type].text
+    },
+    ratesFilter (name) {
+      return ratesMap[name].text
     }
   },
   data () {
     return {
       zh_CN,
       locations: ['商圈/地标', '机场/火车站', '轨道交通', '行政区', '景点'],
-      brands: ['昆仑', '锦江', '希岸', '维也纳酒店', '白玉兰', '凯里亚德（中国）', '丽笙', '希尔顿欢朋', 'IU酒店', '7天优品', '丽枫', '郁锦香', '锦江都城'],
+      brands: [],
       rates: ['公寓', '民宿', '青旅', '经济连锁', '高级连锁'],
       locationDefault: '不限',
+      curLocation: null,
       brandDefault: '不限',
       brandNums: [],
       rateDefault: '不限',
@@ -258,11 +316,19 @@ export default {
       curValue: null,
       minPrice: 0,
       maxPrice: 9999,
+      address: null,
+      hName: null,
       tags: [],
       cleanBtn: false,
-      queryParam: {},
-      pagination: {},
-      hotels: []
+      pagination: {
+        pageNo: 1,
+        pageSize: 10,
+        sortField: 'rate',
+        sortOrder: 'descend',
+        totalElements: 0
+      },
+      hotels: [],
+      isLoading: false
     };
   },
 
@@ -281,8 +347,10 @@ export default {
         const locTags = this.tags.filter(tag => this.locations.includes(tag))
         this.tags = this.tags.filter(tag => !locTags.includes(tag))
         this.tags.push(e.target.value)
+        this.curLocation = e.target.value
         this.cleanBtn = true
       }
+      this.loadHotel()
     },
     changeBrandRadio: function(e) {
       // 筛选出tags里所有属于brand的tag
@@ -291,6 +359,7 @@ export default {
       this.tags = this.tags.filter(tag => !braTags.includes(tag))
       this.tags.length == 0 ? this.cleanBtn = false : this.cleanBtn = true
       this.brandNums = []
+      this.loadHotel()
     },
     brandChange: function(checkedValue) {
       if (checkedValue.length > 0) {
@@ -315,6 +384,7 @@ export default {
         this.changeBrandRadio()
         this.brandDefault = '不限'
       }
+      this.loadHotel()
     },
     changeRateRadio: function(e) {
       // 筛选出tags里所有属于rate的tag
@@ -323,6 +393,7 @@ export default {
       this.tags = this.tags.filter(tag => !rateTags.includes(tag))
       this.tags.length == 0 ? this.cleanBtn = false : this.cleanBtn = true
       this.rateNums = []
+      this.loadHotel()
     },
     rateChange: function(checkedValue) {
       if (checkedValue.length > 0) {
@@ -347,6 +418,7 @@ export default {
         this.changeRateRadio()
         this.rateDefault = '不限'
       }
+      this.loadHotel()
     },
     changePriceRadio: function(e) {
       if (e != null) {
@@ -357,6 +429,7 @@ export default {
       this.curValue = null
       this.minPrice = 0
       this.maxPrice = 9999
+      this.loadHotel()
     },
     priceChange: function(e) {
       let priceTag = ''
@@ -364,7 +437,7 @@ export default {
 
       if (e.target.value == 200) {
         this.minPrice = 0
-        this.maxPrice = e.target.value - 1
+        this.maxPrice = e.target.value
         priceTag = '200以下'
       } else if (e.target.value == 400) {
         this.minPrice = 200
@@ -384,6 +457,7 @@ export default {
       this.tags = this.tags.filter(tag => !del.includes(tag))
       this.tags.push(priceTag)
       this.cleanBtn = true
+      this.loadHotel()
     },
     handleClose: function(removedTag) {
       this.tags = this.tags.filter(tag => tag !== removedTag)
@@ -400,6 +474,7 @@ export default {
         this.priceDefault = '不限'
       }
       this.tags.length == 0 ? this.cleanBtn = false : this.cleanBtn = true
+      this.loadHotel()
     },
     deleteAllTags: function() {
       // 所有属性初始化
@@ -407,6 +482,7 @@ export default {
       this.brandNums = []
       this.rateNums = []
       this.curValue = null
+      this.curLocation = null
       this.minPrice = 0
       this.maxPrice = 9999
       this.cleanBtn = false
@@ -414,6 +490,7 @@ export default {
       this.brandDefault = '不限'
       this.rateDefault = '不限'
       this.priceDefault = '不限'
+      this.loadHotel()
     },
     searchPrice: function() {
       // 先删掉已有的价格标签
@@ -425,6 +502,7 @@ export default {
       this.priceDefault = ''
       this.curValue = null
       this.cleanBtn = true
+      this.loadHotel()
     },
     goTo: function(id) {
       getHotelDetail(id)
@@ -445,23 +523,38 @@ export default {
         })
     },
     loadHotel: function() {
-      getHotelList({...this.pagination})
-      .then(res => {
+      let rates = []
+      let location = null
+
+      this.rateNums.forEach(rate => rates.push(this.$options.filters['ratesFilter'](rate)))
+      if (this.curLocation != null) {
+        location = this.$options.filters['locationFilter'](this.curLocation)
+      }
+
+      let params = {
+        location: location,
+        brands: this.brandNums,
+        types: rates,
+        minPrice: this.minPrice,
+        maxPrice: this.maxPrice,
+        address: this.address,
+        hname: this.hName
+      }
+      this.isLoading = true
+      // console.log(params)
+      // getHotelList({...this.pagination})
+      findByQuery({...params, ...this.pagination}).then(res => {
         if (res.success == true) {
           // console.log("加载酒店成功")
           this.hotels = res.data.content
-          this.pagination = {
-            pageNo: res.data.number + 1,
-            pageSize: res.data.size,
-            sortField: 'rate',
-            sortOrder: 'descend',
-            totalElements: res.data.totalElements
-          }
+          this.pagination.pageNo = res.data.number + 1
+          this.pagination.pageSize = res.data.size
+          this.pagination.totalElements = res.data.totalElements
+          this.isLoading = false
         } else {
           this.$message.error(`加载酒店失败: ${res.data}`)
         }
-      })
-      .catch(err => {
+      }).catch(err => {
         this.$message.error(`加载酒店异常: ${err.message}`)
       })
     },
@@ -473,6 +566,42 @@ export default {
       this.pagination.pageNo = pageNo
       this.pagination.pageSize = pageSize
       this.loadHotel()
+    },
+    getBrand: function() {
+      getBrand().then(res => {
+        if (res.success == true) {
+          this.brands = res.data
+        } else {
+          this.$message.error(`加载品牌失败: ${res.data}`)
+        }
+      }).catch(err => {
+        this.$message.error(`加载品牌异常: ${err.message}`)
+      })
+    },
+    handleResetSearch: function() {
+      this.address = null
+      this.hName = null
+      this.loadHotel()
+    },
+    handleSort: function(e) {
+      this.pagination.pageNo = 1
+      if (1 == e.target.value) {
+        this.pagination.sortField = "rate"
+        this.pagination.sortOrder = "descend"
+        this.loadHotel()
+      } else if (2 == e.target.value) {
+        this.pagination.sortField = "rate"
+        this.pagination.sortOrder = "ascend"
+        this.loadHotel()
+      } else if (3 == e.target.value) {
+        this.pagination.sortField = "landprice"
+        this.pagination.sortOrder = "ascend"
+        this.loadHotel()
+      } else {
+        this.pagination.sortField = "landprice"
+        this.pagination.sortOrder = "descend"
+        this.loadHotel()
+      }
     }
  }
 }

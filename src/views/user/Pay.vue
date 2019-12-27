@@ -8,7 +8,7 @@
         </div>
         <div class="content">
           <div class="pic">
-            <img src="@/assets/hotel-demo1.jpg" alt="">
+            <img :src="'/api' + hotel.img" style="width: 100%; height: 100%">
           </div>
           <div class="details">
             <p class="name">{{ hotel.hname }}</p>
