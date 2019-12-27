@@ -50,36 +50,7 @@
             <a-button @click="handleCleanPrice" :style="{ marginLeft: '8px' }">清空</a-button>
           </a-form-item>
         </a-col>
-        <!-- <a-col key="15" :span="24" >
-        ---------- <strong>年终总结</strong> ----------
-        </a-col>
-        <a-col key="7" :span="24" >
-          <a-checkbox>获得驾照</a-checkbox>
-        </a-col>
-        <a-col key="8" :span="24" >
-          <a-checkbox>每天记账</a-checkbox>
-        </a-col>
-        <a-col key="9" :span="24" >
-          <a-checkbox>一个人去电影院看电影</a-checkbox>
-        </a-col>
-        <a-col key="10" :span="24" >
-          <a-checkbox>去旅行</a-checkbox>
-        </a-col>
-        <a-col key="11" :span="24" >
-          <a-checkbox>≥60kg</a-checkbox>
-        </a-col>
-        <a-col key="12" :span="24" >
-          <a-checkbox disabled>过六级</a-checkbox>
-        </a-col>
-        <a-col key="13" :span="24" >
-          <a-checkbox>献一次血</a-checkbox>
-        </a-col>
-        <a-col key="14" :span="24" >
-          <a-checkbox>使用同一头像时长≥1年</a-checkbox>
-        </a-col>
-        <a-col key="16" :span="24" >
-        -------------------------------
-        </a-col> -->
+        
       </a-row>
       <a-row>
         <a-col :span="24" :style="{ textAlign: 'right' }">
@@ -141,7 +112,7 @@
           <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
           <a-popconfirm title="是否要删除此行？" @confirm="handleDelete(record)">
-            <a>删除</a>
+            <a style="color: red">删除</a>
           </a-popconfirm>
         </template>
       </span>

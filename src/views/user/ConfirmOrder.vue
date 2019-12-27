@@ -286,6 +286,7 @@ import Header from './Header'
 import Footer from './Footer'
 import moment from 'moment'
 import { confirmOrder } from '@/api/order'
+import { user_info } from '@/utils/encrypt'
 
 const roomTypesMap = {
   STANDARD: {
@@ -351,8 +352,10 @@ export default {
       this.room = this.$route.params.room
       this.startTime = this.$route.params.startTime
       this.endTime = this.$route.params.endTime
-      this.checkInPerson = this.user.uname
-      this.telephone = this.user.telephone
+      // this.checkInPerson = this.user.uname
+      // this.telephone = this.user.telephone
+      this.checkInPerson = user_info.uname
+      this.telephone = user_info.telephone
     },
     changeUser: function() {
       this.isChecked = !this.isChecked

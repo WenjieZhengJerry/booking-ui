@@ -31,7 +31,7 @@
           </div>
           <div class="info-detail">
             <div class="main-section">
-              <h1>{{ hotel.hname }}</h1>
+              <h1>{{ hotel.hname }} · {{ hotel.brand }}</h1>
               <a-tag color="blue">{{ hotel.type | hotelTypeFilter }}</a-tag>
               <div class="address">
                 <p :style="{ margin: 0, padding: 0 }">地址：{{ hotel.address }}</p>
@@ -112,6 +112,9 @@
                 </a-col>
               </a-col>
             </a-row>
+          </div>
+          <div class="room-div" v-if="rooms.length == 0">
+            <a-empty />
           </div>
         </div>
         <div class="detail-tab">
@@ -341,6 +344,7 @@ import zh_CN from "ant-design-vue/lib/locale-provider/zh_CN";
 import Header from "./Header";
 import Footer from "./Footer";
 import moment from 'moment';
+import { user_info } from '@/utils/encrypt'
 import { getHotelDetail } from '@/api/hotel'
 import { getCommentList } from '@/api/comment'
 
@@ -524,6 +528,10 @@ export default {
   methods: {
     moment,
     bookNow: function(room) {
+      if (user_info == null) {
+        this.$message.error("请先登录")
+        return
+      }
       if (this.startTime == undefined || this.startTime == null) {
         this.$message.error("请选择入住日期")
         return

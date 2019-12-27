@@ -54,3 +54,20 @@ export function getHotelDetail (id) {
         method: 'get'
     })
 }
+
+//获取酒店品牌
+export function getBrand () {
+    return axios({
+        url: `${api.hotel}/getBrand`,
+        method: 'get'
+    })
+}
+
+export function findByQuery (parameter) {
+    // console.log(parameter)
+    return axios({
+        url: `${api.hotel}/get`,
+        method: 'post',
+        data: parameter
+    })
+}
