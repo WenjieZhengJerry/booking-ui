@@ -16,6 +16,10 @@
           <a-icon type="home" />
           <span>酒店管理</span>
         </a-menu-item>
+        <a-menu-item key="4">
+          <a-icon type="message" />
+          <span>评论管理</span>
+        </a-menu-item>
       </a-menu>
     </a-layout-sider>
     <a-layout>
@@ -46,6 +50,7 @@
 
 <script>
 import { isLogin, logout } from '@/api/login'
+import { user_info, setUserInfo } from '@/utils/encrypt'
 import { errorTipsMap } from '@/utils/errorTips'
 export default {
  name: 'Home',
@@ -68,34 +73,38 @@ export default {
       case '3':
         this.$router.push('/admin/hotelManage')
         break;
+      case '4':
+        this.$router.push('/admin/commentManage')
+        break;
      }
    },
    exit(){
     logout().then(res => {
-        if (res.success === true) {
-          this.$router.push('/')
-          return
-        }
-        console.log('logout error',errorTipsMap[res.data])
-      }).catch(ex => {
-        console.log('logout error',ex.message)
-      })
+      if (res.success === true) {
+        setUserInfo(null)
+        this.$router.push('/login')
+        return
+        return
+      }
+      console.log('logout error',errorTipsMap[res.data])
+    }).catch(ex => {
+      console.log('logout error',ex.message)
+    })
    }
  },
-  created () {
+  created (){
+    if(null!==user_info){
+      this.userInfo=user_info
+      return
+    }
     isLogin().then(res => {
       if (res.success === true) {
-        if(null!==res.data){
-          this.userInfo=res.data
-          this.uName=res.data.uName
-          this.avatarImg='/api'+res.data.icon
-          if(1===res.data.type){
-            return
-          }
-        }
-        this.$router.push('/userCenter')
+        this.userInfo=res.data
+        setUserInfo(res.data)
+        return
       }
       console.log('isLogin error',errorTipsMap[res.data])
+      this.$router.push('/login')
     }).catch(ex => {
       console.log('isLogin error',ex.message)
     })

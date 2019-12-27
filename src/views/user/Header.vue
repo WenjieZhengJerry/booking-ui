@@ -63,7 +63,18 @@ export default {
   },
   created (){
     if(null===user_info){
-      this.is_login=false
+      isLogin().then(res => {
+        if (res.success === true) {
+          setUserInfo(res.data)
+          this.is_login=true
+          this.userInfo=res.data
+          return
+        }
+        console.log('isLogin error',errorTipsMap[res.data])
+        this.is_login=false
+      }).catch(ex => {
+        console.log('isLogin error',ex.message)
+      })
     }
     else{
       this.is_login=true

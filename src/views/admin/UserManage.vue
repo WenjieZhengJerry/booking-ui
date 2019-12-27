@@ -252,6 +252,7 @@ export default {
           return
         }
         this.$notification.error({message: `更新失败: ${errorTipsMap[res.data]}`})
+        this.$refs.table.refresh()
       })
       .catch(ex => {
         this.$notification.error({message: '请求出现错误，请稍后再试'})

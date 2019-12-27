@@ -165,135 +165,158 @@
                 <div class="review-show">
                   <div class="review-star">
                     <p class="score">
-                      <b>4.8</b>/5分
+                      <b>{{ hotel.rate }}</b>/5分
                     </p>
-                    <p>{{ comments.length }} 条真实评论</p>
+                    <p>{{ (badComment+middleComment+goodComment) }} 条真实评论</p>
                   </div>
                   <div class="comment-box">
                     <div class="comment-main">
                       <span>服务态度</span><br>
-                      <a-rate :defaultValue="4.5" allowHalf disabled />
+                      <a-rate :defaultValue="hotel.rate" allowHalf disabled />
                     </div>
                     <div class="comment-main">
                       <span>设施设备</span><br>
-                      <a-rate :defaultValue="4.5" allowHalf disabled />
+                      <a-rate :defaultValue="hotel.rate" allowHalf disabled />
                     </div>
                     <div class="comment-main">
                       <span>环境卫生</span><br>
-                      <a-rate :defaultValue="4.5" allowHalf disabled />
+                      <a-rate :defaultValue="hotel.rate" allowHalf disabled />
                     </div>
                     <div class="comment-main">
                       <span>地理位置</span><br>
-                      <a-rate :defaultValue="4.5" allowHalf disabled />
+                      <a-rate :defaultValue="hotel.rate" allowHalf disabled />
                     </div>
                   </div>
                 </div>
-                <a-tabs defaultActiveKey="1" style="margin-top: 10px;">
-                  <a-tab-pane :tab="'全部点评 ' + comments.length" key="1">
-                    <div class="user-review-box" v-for="(comment, index) in comments" :key="index">
-                      <div class="user-img">
-                        <a-avatar :size="80" :src="reviewUserImg" />
-                        <span>{{ comment.uName }}</span>
+                <a-tabs defaultActiveKey="1" style="margin-top: 10px;" @change="callback">
+                  <a-tab-pane :tab="'全部点评 ' + (badComment+middleComment+goodComment)" key="1">
+                    <template v-if="(badComment+middleComment+goodComment) > 0">
+                      <div class="user-review-box" v-for="(comment, index) in comments" :key="index">
+                        <div class="user-img">
+                          <a-avatar :size="80" :src="reviewUserImg" />
+                          <span>{{ comment.user.uname }}</span>
+                        </div>
+                        <div class="review-comment">
+                          <div class="review-main">
+                            <p>{{ comment.content }}</p>
+                          </div>
+                          <div class="review-user-star">
+                            <a-rate :defaultValue="comment.rate" allowHalf disabled />
+                            <span>{{ comment.date }}</span>
+                          </div>
+                          <div class="manage-main" v-if="comment.reply != '' && comment.reply != null">
+                            <div class="manage-name">店长回复：</div>
+                            <div class="manage-contain">{{ comment.reply }}</div>
+                          </div>
+                        </div>
                       </div>
-                      <div class="review-comment">
-                        <div class="review-main">
-                          <p>{{ comment.content }}</p>
-                        </div>
-                        <div class="review-user-star">
-                          <a-rate :defaultValue="comment.rate" allowHalf disabled />
-                          <span>{{ comment.createTime }}</span>
-                        </div>
-                        <div class="manage-main" v-if="comment.reply != '' && comment.reply != null">
-                          <div class="manage-name">店长回复：</div>
-                          <div class="manage-contain">{{ comment.reply }}</div>
-                        </div>
+                      <!-- 分页 -->
+                      <div class="pagination">
+                        <a-pagination showQuickJumper :defaultCurrent="defaultCurrent" :defaultPageSize="defaultPageSize" :total="total" @change="onChangePage" />
                       </div>
-                    </div>
-                    <!-- 分页 -->
-                    <div class="pagination">
-                      <a-pagination showQuickJumper :defaultCurrent="1" :defaultPageSize="10" :total="100" />
-                    </div>
+                    </template>
+                    <template v-else>
+                      <a-empty/>
+                      <!-- <div>暂时没有好评哦！</div> -->
+                    </template>
                   </a-tab-pane>
                   <a-tab-pane :tab="'好评 ' + goodComment" key="2">
-                    <div v-for="(comment, index) in comments" :key="index">
-                      <div class="user-review-box" v-if="comment.rate >= 4">
-                        <div class="user-img">
-                          <a-avatar :size="80" :src="reviewUserImg" />
-                          <span>{{ comment.uName }}</span>
-                        </div>
-                        <div class="review-comment">
-                          <div class="review-main">
-                            <p>{{ comment.content }}</p>
+                    <template v-if="goodComment > 0">
+                      <div v-for="(comment, index) in comments" :key="index">
+                        <div class="user-review-box" v-if="comment.type == 'PRAISE'">
+                          <div class="user-img">
+                            <a-avatar :size="80" :src="reviewUserImg" />
+                            <span>{{ comment.user.uname }}</span>
                           </div>
-                          <div class="review-user-star">
-                            <a-rate :defaultValue="comment.rate" allowHalf disabled />
-                            <span>{{ comment.createTime }}</span>
-                          </div>
-                          <div class="manage-main" v-if="comment.reply != '' && comment.reply != null">
-                            <div class="manage-name">店长回复：</div>
-                            <div class="manage-contain">{{ comment.reply }}</div>
+                          <div class="review-comment">
+                            <div class="review-main">
+                              <p>{{ comment.content }}</p>
+                            </div>
+                            <div class="review-user-star">
+                              <a-rate :defaultValue="comment.rate" allowHalf disabled />
+                              <span>{{ comment.date }}</span>
+                            </div>
+                            <div class="manage-main" v-if="comment.reply != '' && comment.reply != null">
+                              <div class="manage-name">店长回复：</div>
+                              <div class="manage-contain">{{ comment.reply }}</div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <!-- 分页 -->
-                    <div class="pagination">
-                      <a-pagination showQuickJumper :defaultCurrent="1" :defaultPageSize="10" :total="100" />
-                    </div>
+                      <!-- 分页 -->
+                      <div class="pagination">
+                        <a-pagination showQuickJumper :defaultCurrent="defaultCurrent" :defaultPageSize="defaultPageSize" :total="total" @change="onChangePage" />
+                      </div>
+                    </template>
+                    <template v-else>
+                      <a-empty/>
+                     <!--  <div>暂时没有好评哦！</div> -->
+                    </template>
                   </a-tab-pane>
                   <a-tab-pane :tab="'中评 ' + middleComment" key="3">
-                    <div v-for="(comment, index) in comments" :key="index">
-                      <div class="user-review-box" v-if="comment.rate >= 3 && comment.rate < 4">
-                        <div class="user-img">
-                          <a-avatar :size="80" :src="reviewUserImg" />
-                          <span>{{ comment.uName }}</span>
-                        </div>
-                        <div class="review-comment">
-                          <div class="review-main">
-                            <p>{{ comment.content }}</p>
+                    <template v-if="middleComment>0">
+                      <div v-for="(comment, index) in comments" :key="index">
+                        <div class="user-review-box" v-if="comment.type == 'AVERAGE'">
+                          <div class="user-img">
+                            <a-avatar :size="80" :src="reviewUserImg" />
+                            <span>{{ comment.user.uname }}</span>
                           </div>
-                          <div class="review-user-star">
-                            <a-rate :defaultValue="comment.rate" allowHalf disabled />
-                            <span>{{ comment.createTime }}</span>
-                          </div>
-                          <div class="manage-main" v-if="comment.reply != '' && comment.reply != null">
-                            <div class="manage-name">店长回复：</div>
-                            <div class="manage-contain">{{ comment.reply }}</div>
+                          <div class="review-comment">
+                            <div class="review-main">
+                              <p>{{ comment.content }}</p>
+                            </div>
+                            <div class="review-user-star">
+                              <a-rate :defaultValue="comment.rate" allowHalf disabled />
+                              <span>{{ comment.date }}</span>
+                            </div>
+                            <div class="manage-main" v-if="comment.reply != '' && comment.reply != null">
+                              <div class="manage-name">店长回复：</div>
+                              <div class="manage-contain">{{ comment.reply }}</div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <!-- 分页 -->
-                    <div class="pagination">
-                      <a-pagination showQuickJumper :defaultCurrent="1" :defaultPageSize="10" :total="100" />
-                    </div>
+                      <!-- 分页 -->
+                      <div class="pagination">
+                        <a-pagination showQuickJumper :defaultCurrent="defaultCurrent" :defaultPageSize="defaultPageSize" :total="total" @change="onChangePage" />
+                      </div>
+                    </template>
+                    <template v-else>
+                      <div>暂时没有中评哦！</div>
+                    </template>
                   </a-tab-pane>
                   <a-tab-pane :tab="'差评 ' + badComment" key="4">
-                    <div v-for="(comment, index) in comments" :key="index">
-                      <div class="user-review-box" v-if="comment.rate < 3">
-                        <div class="user-img">
-                          <a-avatar :size="80" :src="reviewUserImg" />
-                          <span>{{ comment.uName }}</span>
-                        </div>
-                        <div class="review-comment">
-                          <div class="review-main">
-                            <p>{{ comment.content }}</p>
+                    <template v-if="badComment>0">
+                      <div v-for="(comment, index) in comments" :key="index">
+                        <div class="user-review-box" v-if="comment.type == 'CRITICIZE'">
+                          <div class="user-img">
+                            <a-avatar :size="80" :src="reviewUserImg" />
+                            <span>{{ comment.user.uname }}</span>
                           </div>
-                          <div class="review-user-star">
-                            <a-rate :defaultValue="comment.rate" allowHalf disabled />
-                            <span>{{ comment.createTime }}</span>
-                          </div>
-                          <div class="manage-main" v-if="comment.reply != '' && comment.reply != null">
-                            <div class="manage-name">店长回复：</div>
-                            <div class="manage-contain">{{ comment.reply }}</div>
+                          <div class="review-comment">
+                            <div class="review-main">
+                              <p>{{ comment.content }}</p>
+                            </div>
+                            <div class="review-user-star">
+                              <a-rate :defaultValue="comment.rate" allowHalf disabled />
+                              <span>{{ comment.date }}</span>
+                            </div>
+                            <div class="manage-main" v-if="comment.reply != '' && comment.reply != null">
+                              <div class="manage-name">店长回复：</div>
+                              <div class="manage-contain">{{ comment.reply }}</div>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <!-- 分页 -->
-                    <div class="pagination">
-                      <a-pagination showQuickJumper :defaultCurrent="1" :defaultPageSize="10" :total="100" />
-                    </div>
+                      <!-- 分页 -->
+                      <div class="pagination">
+                        <a-pagination showQuickJumper :defaultCurrent="defaultCurrent" :defaultPageSize="defaultPageSize" :total="total" @change="onChangePage" />
+                      </div>
+                    </template>
+                    <template v-else>
+                      <a-empty/>
+                      <!-- <div>暂时没有差评哦！</div> -->
+                    </template>
                   </a-tab-pane>
                 </a-tabs>
               </div>
@@ -322,6 +345,8 @@ import Header from "./Header";
 import Footer from "./Footer";
 import moment from 'moment';
 import { user_info } from '@/utils/encrypt'
+import { getHotelDetail } from '@/api/hotel'
+import { getCommentList } from '@/api/comment'
 
 const hotelTypesMap = {
   APARTMENT: {
@@ -356,6 +381,21 @@ const roomTypesMap = {
   },
 }
 
+const commentTypesMap = {
+  1: {
+    text: ''
+  },
+  2: {
+    text: 'PRAISE'
+  },
+  3: {
+    text: 'AVERAGE'
+  },
+  4: {
+    text: 'CRITICIZE'
+  },
+}
+
 export default {
   name: "HotelDetail",
   components: {
@@ -377,6 +417,36 @@ export default {
   created: function() {
     this.hotel = this.$route.params.hotelDetail.hotel
     this.rooms = this.$route.params.hotelDetail.rooms
+    this.badComment = this.$route.params.hotelDetail.criticize
+    this.middleComment = this.$route.params.hotelDetail.average
+    this.goodComment = this.$route.params.hotelDetail.praise
+
+    let queryData = {
+      "sortField":"date",
+      "pageSize": 2,
+      "pageNo": 1,
+      "hidKey": this.hotel.hid,
+      "typeKey": this.type
+    }
+    getCommentList(queryData).then(res => {
+        if (res.success === true) {
+          this.comments = res.data.content
+          this.defaultCurrent = res.data.number + 1
+          this.defaultPageSize = res.data.size
+          this.total = res.data.totalElements
+        } else {
+          this.comments = []
+          this.defaultCurrent = 1
+          this.defaultPageSize = 2
+          this.total = 0
+        }
+    }).catch(ex => {
+      this.comments = []
+      this.defaultCurrent = 1
+      this.defaultPageSize = 2
+      this.total = 0
+    })
+    
   },
   data() {
     return {
@@ -397,7 +467,7 @@ export default {
       hotelImgs: [],
       rooms: [],
       comments: [
-        {
+        /* {
           avatar: '',
           uName: '31***30',
           content: '这是我住过的最差劲的酒店，一晚上将近1000的房子，到了晚上七点多外面就开始唱歌，唱到11点才结束，我想休息一下都不行，还说这个没办法解决。我告诉你们怎么解决，把所有的城景套房全部下架，你们既然定了这么高的价格，就要给消费者相对应的服务和体验。 洗手间里水管是漏的，一用洗手间就满地的水。热水也要放很久很久水才有，真不知道这酒店凭什么是这个价格。真牛逼',
@@ -444,11 +514,15 @@ export default {
           rate: 3.5,
           createTime: '2019年09月',
           reply: '尊敬的宾客，感谢您选择上海国际饭店，很抱歉这次没有给到您满意的入住体验。的确，国际饭店地处上海市中心，外部噪音影响到您晚上的休息，我们深感歉意，饭店一直在与相关部门进行沟通协调，争取能早日改善这一问题。关于水管漏和热水要放很久的问题，我们也已经列入装修改造的计划中，会为选择国际饭店的宾客提供物有所值的入住体验。再次对给您造成的不便致以诚挚的歉意，祝您平安幸福，事事如意！'
-        }
+        } */
       ],
-      goodComment: 2,
-      middleComment: 1,
-      badComment: 3
+      goodComment: 0,
+      middleComment: 0,
+      badComment: 0,
+      defaultCurrent: 1,
+      defaultPageSize: 2,
+      total: 0,
+      type: ''
     };
   },
   methods: {
@@ -475,6 +549,64 @@ export default {
           room: room,
           user: this.user
         }
+      })
+    },
+    onChangePage(pageNumber) {
+      console.log('Page: ', pageNumber)
+      this.defaultCurrent = pageNumber
+      let queryData = {
+        "sortField":"date",
+        "pageSize": this.defaultPageSize,
+        "pageNo": this.defaultCurrent,
+        "hidKey": this.hotel.hid,
+        "typeKey": this.type
+      }
+      getCommentList(queryData).then(res => {
+          if (res.success === true) {
+            this.comments = res.data.content
+            this.defaultCurrent = res.data.number + 1
+            this.defaultPageSize = res.data.size
+            this.total = res.data.totalElements
+          } else {
+            this.comments = []
+            this.defaultCurrent = 1
+            this.defaultPageSize = 2
+            this.total = 0
+          }
+      }).catch(ex => {
+        this.comments = []
+        this.defaultCurrent = 1
+        this.defaultPageSize = 2
+        this.total = 0
+      })
+    },
+    callback(key) {
+      //console.log(commentTypesMap[key].text)
+      this.type = commentTypesMap[key].text
+      let queryData = {
+        "sortField":"date",
+        "pageSize": this.defaultPageSize,
+        "pageNo": 1,
+        "hidKey": this.hotel.hid,
+        "typeKey": this.type
+      }
+      getCommentList(queryData).then(res => {
+          if (res.success === true) {
+            this.comments = res.data.content
+            this.defaultCurrent = res.data.number + 1
+            this.defaultPageSize = res.data.size
+            this.total = res.data.totalElements
+          } else {
+            this.comments = []
+            this.defaultCurrent = 1
+            this.defaultPageSize = 2
+            this.total = 0
+          }
+      }).catch(ex => {
+        this.comments = []
+        this.defaultCurrent = 1
+        this.defaultPageSize = 2
+        this.total = 0
       })
     }
   }

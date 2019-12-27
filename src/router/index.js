@@ -116,6 +116,11 @@ export default new Router({
           path: '/admin/roomManage/:hid',
           name: 'RoomManage',
           component: () => import('@/views/admin/RoomManage')
+        },
+        {
+          path: '/admin/commentManage',
+          name: 'CommentManage',
+          component: () => import('@/views/admin/CommentManage')
         }
       ]
     }
