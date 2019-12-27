@@ -120,6 +120,10 @@ const orderStatusMap = {
   SUCCESS: {
     status: 'success',
     text: '已完成'
+  },
+  REVIEWED: {
+    status: 'reviewed',
+    text: '已评价'
   }
 }
 

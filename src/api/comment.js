@@ -31,7 +31,7 @@ export function deleteCommentAll (parameter) {
 //添加评论 parameter: {...comment}
 export function addComment (parameter) {
     return axios({
-        url: `${api.comment}`,
+        url: `${api.comment}/${parameter.oid}`,
         method: 'post',
         data: parameter
     })

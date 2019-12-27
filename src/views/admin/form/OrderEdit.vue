@@ -93,6 +93,7 @@
               <a-select-option value="UNPAY">待付款</a-select-option>
               <a-select-option value="SUCCESS">已完成</a-select-option>
               <a-select-option value="CANCEL">已取消</a-select-option>
+              <a-select-option value="REVIEWED">已评价</a-select-option>
             </a-select>
           </a-form-item>
 

@@ -10,6 +10,7 @@
           <a-select-option value="UNPAY">待付款</a-select-option>
           <a-select-option value="SUCCESS">已完成</a-select-option>
           <a-select-option value="CANCEL">已取消</a-select-option>
+          <a-select-option value="REVIEWED">已评价</a-select-option>
         </a-select>
       </div>
     </div>
@@ -58,10 +59,12 @@
                     <a>取消订单</a>
                   </a-popconfirm>  
                 </a-button>
-                <a-button @click="bookAgain(order.hotel.hid)" v-if="order.status == 'SUCCESS' || order.status == 'CANCEL'"
+                <a-button @click="bookAgain(order.hotel.hid)" v-if="order.status == 'SUCCESS' || order.status == 'CANCEL' || order.status == 'REVIEWED'" 
                   type="primary" class="btn">再次预定</a-button>
-                <a-button @click="bookAgain(order.hotel.hid)" v-if="order.status == 'SUCCESS'"
-                  type="default" class="btn" style="width: 88px">去评价</a-button>
+                <a-button @click="evaluateOrder(order.oid)" v-if="order.status == 'SUCCESS'"
+                  type="default" class="btn" style="width: 88px">评价订单</a-button>
+                <a-button @click="bookAgain(order.hotel.hid)" v-if="order.status == 'REVIEWED'"
+                  type="default" class="btn" style="width: 88px">查看评价</a-button>
                 <a-button v-if="order.status == 'CANCEL'" type="danger" class="btn">
                   <a-popconfirm title="是否要删除此订单？" @confirm="deleteThis(order.oid)">
                     <a>删除订单</a>
@@ -76,6 +79,7 @@
         </li>
       </ul>
     </div>
+    <evaluate-order ref="evaluateModal" @ok="handleOk" />
   </div>
 </a-locale-provider>
 </template>
@@ -84,6 +88,7 @@
 import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN'
 import { getMyOrders, getAOrder, deleteOrder } from '@/api/order'
 import { getHotelDetail } from '@/api/hotel'
+import EvaluateOrder from './EvaluateOrder'
 
 const orderStatusMap = {
   UNPAY: {
@@ -101,6 +106,10 @@ const orderStatusMap = {
   SUCCESS: {
     status: 'success',
     text: '已完成'
+  },
+  REVIEWED: {
+    status: 'default',
+    text: '已评价'
   }
 }
 
@@ -123,6 +132,9 @@ export default {
  name: 'MyOrders',
  created: function() {
    this.loadingData()
+ },
+ components: {
+   EvaluateOrder
  },
  filters: {
     statusFilter (type) {
@@ -221,7 +233,14 @@ export default {
       }).catch(err => {
        this.$message.error(`删除订单异常: ${err.message}`)
      })
-    }
+   },
+   evaluateOrder(oid) {
+      console.log("打开评价框")
+      this.$refs.evaluateModal.evaluate(oid);
+   },
+   handleOk() {
+      this.$router.go(0)
+   }
  }
 }
 
