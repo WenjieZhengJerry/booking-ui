@@ -15,17 +15,8 @@
               <div>
                 <img :src="'/api/' + hotel.img" />
               </div>
-              <div>
-                <img src="@/assets/hotel-demo2.jpg" />
-              </div>
-              <div>
-                <img src="@/assets/hotel-demo3.jpg" />
-              </div>
-              <div>
-                <img src="@/assets/hotel-demo4.jpg" />
-              </div>
-              <div>
-                <img src="@/assets/hotel-demo5.jpg" />
+              <div v-for="(room, index) in rooms" :key="index">
+                <img :src="'/api' + room.img" />
               </div>
             </a-carousel>
           </div>
@@ -193,7 +184,7 @@
                     <template v-if="(badComment+middleComment+goodComment) > 0">
                       <div class="user-review-box" v-for="(comment, index) in comments" :key="index">
                         <div class="user-img">
-                          <a-avatar :size="80" :src="reviewUserImg" />
+                          <a-avatar :size="80" :src="'/api' + comment.user.icon" />
                           <span>{{ comment.user.uname }}</span>
                         </div>
                         <div class="review-comment">
@@ -225,7 +216,7 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'PRAISE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="reviewUserImg" />
+                            <a-avatar :size="80" :src="'/api' + comment.user.icon" />
                             <span>{{ comment.user.uname }}</span>
                           </div>
                           <div class="review-comment">
@@ -258,7 +249,7 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'AVERAGE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="reviewUserImg" />
+                            <a-avatar :size="80" :src="'/api' + comment.user.icon" />
                             <span>{{ comment.user.uname }}</span>
                           </div>
                           <div class="review-comment">
@@ -282,7 +273,8 @@
                       </div>
                     </template>
                     <template v-else>
-                      <div>暂时没有中评哦！</div>
+                      <a-empty/>
+                      <!-- <div>暂时没有中评哦！</div> -->
                     </template>
                   </a-tab-pane>
                   <a-tab-pane :tab="'差评 ' + badComment" key="4">
@@ -290,7 +282,7 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'CRITICIZE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="reviewUserImg" />
+                            <a-avatar :size="80" :src="'/api' + comment.user.icon" />
                             <span>{{ comment.user.uname }}</span>
                           </div>
                           <div class="review-comment">
@@ -415,6 +407,7 @@ export default {
     // }
   },
   created: function() {
+    this.user = user_info
     this.hotel = this.$route.params.hotelDetail.hotel
     this.rooms = this.$route.params.hotelDetail.rooms
     this.badComment = this.$route.params.hotelDetail.criticize
@@ -423,7 +416,7 @@ export default {
 
     let queryData = {
       "sortField":"date",
-      "pageSize": 2,
+      "pageSize": 20,
       "pageNo": 1,
       "hidKey": this.hotel.hid,
       "typeKey": this.type
@@ -451,76 +444,18 @@ export default {
   data() {
     return {
       zh_CN,
-      reviewUserImg: require('@/assets/user-img-demo.jpg'),
       startTime: moment(),
       endTime: undefined,
-      user: {
-        uid: 1,
-        email: '1234567890@qq.com',
-        enable: 1,
-        icon: 'xxx',
-        telephone: '12345678910',
-        type: 1,
-        uname: '小泽又沐风'
-      },
+      user: undefined,
       hotel: {},
       hotelImgs: [],
       rooms: [],
-      comments: [
-        /* {
-          avatar: '',
-          uName: '31***30',
-          content: '这是我住过的最差劲的酒店，一晚上将近1000的房子，到了晚上七点多外面就开始唱歌，唱到11点才结束，我想休息一下都不行，还说这个没办法解决。我告诉你们怎么解决，把所有的城景套房全部下架，你们既然定了这么高的价格，就要给消费者相对应的服务和体验。 洗手间里水管是漏的，一用洗手间就满地的水。热水也要放很久很久水才有，真不知道这酒店凭什么是这个价格。真牛逼',
-          rate: 4.5,
-          createTime: '2019年09月',
-          reply: ''
-        },
-        {
-          avatar: '',
-          uName: '31***30',
-          content: '这是我住过的最差劲的酒店，一晚上将近1000的房子，到了晚上七点多外面就开始唱歌，唱到11点才结束，我想休息一下都不行，还说这个没办法解决。我告诉你们怎么解决，把所有的城景套房全部下架，你们既然定了这么高的价格，就要给消费者相对应的服务和体验。 洗手间里水管是漏的，一用洗手间就满地的水。热水也要放很久很久水才有，真不知道这酒店凭什么是这个价格。真牛逼',
-          rate: 1,
-          createTime: '2019年09月',
-          reply: '尊敬的宾客，感谢您选择上海国际饭店，很抱歉这次没有给到您满意的入住体验。的确，国际饭店地处上海市中心，外部噪音影响到您晚上的休息，我们深感歉意，饭店一直在与相关部门进行沟通协调，争取能早日改善这一问题。关于水管漏和热水要放很久的问题，我们也已经列入装修改造的计划中，会为选择国际饭店的宾客提供物有所值的入住体验。再次对给您造成的不便致以诚挚的歉意，祝您平安幸福，事事如意！'
-        },
-        {
-          avatar: '',
-          uName: '31***30',
-          content: '这是我住过的最差劲的酒店，一晚上将近1000的房子，到了晚上七点多外面就开始唱歌，唱到11点才结束，我想休息一下都不行，还说这个没办法解决。我告诉你们怎么解决，把所有的城景套房全部下架，你们既然定了这么高的价格，就要给消费者相对应的服务和体验。 洗手间里水管是漏的，一用洗手间就满地的水。热水也要放很久很久水才有，真不知道这酒店凭什么是这个价格。真牛逼',
-          rate: 5,
-          createTime: '2019年09月',
-          reply: ''
-        },
-        {
-          avatar: '',
-          uName: '31***30',
-          content: '这是我住过的最差劲的酒店，一晚上将近1000的房子，到了晚上七点多外面就开始唱歌，唱到11点才结束，我想休息一下都不行，还说这个没办法解决。我告诉你们怎么解决，把所有的城景套房全部下架，你们既然定了这么高的价格，就要给消费者相对应的服务和体验。 洗手间里水管是漏的，一用洗手间就满地的水。热水也要放很久很久水才有，真不知道这酒店凭什么是这个价格。真牛逼',
-          rate: 2.5,
-          createTime: '2019年09月',
-          reply: '尊敬的宾客，感谢您选择上海国际饭店，很抱歉这次没有给到您满意的入住体验。的确，国际饭店地处上海市中心，外部噪音影响到您晚上的休息，我们深感歉意，饭店一直在与相关部门进行沟通协调，争取能早日改善这一问题。关于水管漏和热水要放很久的问题，我们也已经列入装修改造的计划中，会为选择国际饭店的宾客提供物有所值的入住体验。再次对给您造成的不便致以诚挚的歉意，祝您平安幸福，事事如意！'
-        },
-        {
-          avatar: '',
-          uName: '31***30',
-          content: '这是我住过的最差劲的，一晚上将近1000的房子，到了晚上七点多外面就开始唱歌，唱到11点才结束，我想休息一下都不行，还说这个没办法解决。我告诉你们怎么解决，把所有的城景套房全部下架，你们既然定了这么高的价格，就要给消费者相对应的服务和体验。 洗手间里水管是漏的，一用洗手间就满地的水。热水也要放很久很久水才有，真不知道这酒店凭什么是这个价格。真牛逼',
-          rate: 2,
-          createTime: '2019年09月',
-          reply: '尊敬的宾客，感谢您选择上海国际饭店，很抱歉这次没有给到您满意的入住体验。的确，国际饭店地处上海市中心，外部噪音影响到您晚上的休息，我们深感歉意，饭店一直在与相关部门进行沟通协调，争取能早日改善这一问题。关于水管漏和热水要放很久的问题，我们也已经列入装修改造的计划中，会为选择国际饭店的宾客提供物有所值的入住体验。再次对给您造成的不便致以诚挚的歉意，祝您平安幸福，事事如意！'
-        },
-        {
-          avatar: '',
-          uName: '31***30',
-          content: '这是我住过的最差劲的酒店，一晚上将近1000的房子，到了晚上七点多外面就开始唱歌，唱到11点才结束，我想休息一下都不行，还说这个没办法解决。我告诉你们怎么解决，把所有的城景套房全部下架，你们既然定了这么高的价格，就要给消费者相对应的服务和体验。 洗手间里水管是漏的，一用洗手间就满地的水。热水也要放很久很久水才有，真不知道这酒店凭什么是这个价格。真牛逼',
-          rate: 3.5,
-          createTime: '2019年09月',
-          reply: '尊敬的宾客，感谢您选择上海国际饭店，很抱歉这次没有给到您满意的入住体验。的确，国际饭店地处上海市中心，外部噪音影响到您晚上的休息，我们深感歉意，饭店一直在与相关部门进行沟通协调，争取能早日改善这一问题。关于水管漏和热水要放很久的问题，我们也已经列入装修改造的计划中，会为选择国际饭店的宾客提供物有所值的入住体验。再次对给您造成的不便致以诚挚的歉意，祝您平安幸福，事事如意！'
-        } */
-      ],
+      comments: [],
       goodComment: 0,
       middleComment: 0,
       badComment: 0,
       defaultCurrent: 1,
-      defaultPageSize: 2,
+      defaultPageSize: 20,
       total: 0,
       type: ''
     };
@@ -570,13 +505,13 @@ export default {
           } else {
             this.comments = []
             this.defaultCurrent = 1
-            this.defaultPageSize = 2
+            this.defaultPageSize = 20
             this.total = 0
           }
       }).catch(ex => {
         this.comments = []
         this.defaultCurrent = 1
-        this.defaultPageSize = 2
+        this.defaultPageSize = 20
         this.total = 0
       })
     },

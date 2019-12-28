@@ -2,7 +2,7 @@
 <a-locale-provider :locale="zh_CN">
   <div class="main">
     <div class="title">
-      <h4>酒店订单</h4>
+      <h4>酒店订单({{ count }})</h4>
       <div class="form-inline">
         <a-select :defaultValue="status" v-model="status" @change="handleChangeStatus" style="width: 150px">
           <a-select-option value="ALL">全部</a-select-option>
@@ -152,7 +152,8 @@ export default {
   return {
     zh_CN,
     status: 'ALL',
-    orders: []
+    orders: [],
+    count: 0
   };
  },
  methods: {
@@ -161,6 +162,7 @@ export default {
      getMyOrders(uid, this.status).then(res => {
        if (res.success == true) {
          this.orders = res.data
+         this.count = res.data.length
         //  console.log(this.orders[0])
        } else {
          this.$message.error(`加载订单失败: ${res.data}`)
@@ -227,7 +229,7 @@ export default {
       deleteOrder(oid).then(res => {
         if (res.success == true) {
           this.$message.success("删除成功")
-          this.$router.go(0)
+          this.loadingData()
         } else {
           this.$message.error(`删除订单失败: ${res.data}`)
         }

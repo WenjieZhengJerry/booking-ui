@@ -89,6 +89,14 @@
               <a-select-option value="HIGNEND">高级连锁</a-select-option>
             </a-select>
           </a-form-item>
+
+          <a-form-item label="酒店品牌" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-input
+              placeholder="酒店品牌"
+              v-decorator="['brand',
+              {rules: [{ required: true, message: '地址不能为空' }]}]"
+            ></a-input>
+          </a-form-item>
         </a-form>
       </a-spin>
     </a-modal>
@@ -160,7 +168,8 @@ export default {
             'phone': values.phone,
             'address': values.address,
             'img': imgUrl,
-            'rate': 5.0
+            'rate': 5.0,
+            'brand': values.brand
           }
           return addHotel(parameter).then(res => {
             if (res.success === true) {

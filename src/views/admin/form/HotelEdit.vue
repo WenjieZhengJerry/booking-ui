@@ -87,6 +87,11 @@
               <a-select-option value="HIGNEND">高级连锁</a-select-option>
             </a-select>
           </a-form-item>
+
+          <a-form-item label="酒店品牌" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-input v-decorator="['brand',
+            {rules: [{required: true, message: '请填写酒店品牌'}]}]"></a-input>
+          </a-form-item>
         </a-form>
       </a-spin>
     </a-modal>
@@ -154,7 +159,7 @@ export default {
             form: { setFieldsValue }
         } = this
         const formData = pick(record, 
-            ['hid', 'hname', 'address', 'img', 'description', 'service', 'facilities', 'phone', 'type', 'rate']
+            ['hid', 'hname', 'address', 'img', 'description', 'service', 'facilities', 'phone', 'type', 'rate', 'brand']
         )
         if(formData.img != null && formData.img != ""){
             let file = {
@@ -175,7 +180,8 @@ export default {
             'description': formData.description,
             'phone': formData.phone,
             'rate': formData.rate,
-            'type': formData.type
+            'type': formData.type,
+            'brand': formData.brand
             })
         })
     },
@@ -247,7 +253,8 @@ export default {
             'address': values.address,
             'phone': values.phone,
             'img': imgUrl,
-            'rate': values.rate
+            'rate': values.rate,
+            'brand': values.brand
           }
           return updateHotel(parameter).then(res => {
             if (res.success === true) {
