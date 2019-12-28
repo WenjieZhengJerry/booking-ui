@@ -150,7 +150,7 @@ const orderStatusMap = {
     text: '已完成'
   },
   REVIEWED: {
-    status: 'reviewed',
+    status: 'default',
     text: '已评价'
   }
 }
