@@ -22,6 +22,11 @@
             {rules: [{required: true, message: '请输入酒店名字'}]}]"></a-input>
           </a-form-item>
 
+          <a-form-item label="酒店品牌" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-input v-decorator="['brand',
+            {rules: [{required: true, message: '请输入酒店品牌'}]}]"></a-input>
+          </a-form-item>
+
           <a-form-item label="酒店地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-input :maxLength="11" v-decorator="['address',
             {rules: [{required: true, message: '请输入酒店地址'}]}]"></a-input>
@@ -88,9 +93,16 @@
             </a-select>
           </a-form-item>
 
-          <a-form-item label="酒店品牌" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input v-decorator="['brand',
-            {rules: [{required: true, message: '请填写酒店品牌'}]}]"></a-input>
+          <a-form-item label="酒店位置" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-select v-decorator="['location', 
+            {initialValue: 'location',rules: [{required: true, message: '请选择酒店位置'}]}]" 
+            placeholder="请选择">
+              <a-select-option value="LANDMARK">商圈/地标</a-select-option>
+              <a-select-option value="AIRPORT">机场/火车站</a-select-option>
+              <a-select-option value="TRANSPRORTATION">轨道交通</a-select-option>
+              <a-select-option value="ADMINISTRATIVE">行政区</a-select-option>
+              <a-select-option value="VIEWPOINT">景点</a-select-option>
+            </a-select>
           </a-form-item>
         </a-form>
       </a-spin>
@@ -159,7 +171,7 @@ export default {
             form: { setFieldsValue }
         } = this
         const formData = pick(record, 
-            ['hid', 'hname', 'address', 'img', 'description', 'service', 'facilities', 'phone', 'type', 'rate', 'brand']
+            ['hid', 'brand', 'hname', 'address', 'img', 'description', 'service', 'facilities', 'phone', 'type', 'location', 'rate']
         )
         if(formData.img != null && formData.img != ""){
             let file = {
@@ -181,7 +193,8 @@ export default {
             'phone': formData.phone,
             'rate': formData.rate,
             'type': formData.type,
-            'brand': formData.brand
+            'brand': formData.brand,
+            'location': formData.location
             })
         })
     },
@@ -254,7 +267,12 @@ export default {
             'phone': values.phone,
             'img': imgUrl,
             'rate': values.rate,
+<<<<<<< HEAD
             'brand': values.brand
+=======
+            'brand': values.brand,
+            'location': values.location
+>>>>>>> 302bc44ef65c0e7867bc7d750296658e8ac04b24
           }
           return updateHotel(parameter).then(res => {
             if (res.success === true) {

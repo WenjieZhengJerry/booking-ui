@@ -22,6 +22,11 @@
             {rules: [{required: true, message: '请输入酒店名字'}]}]"></a-input>
           </a-form-item>
 
+          <a-form-item label="酒店品牌" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-input placeholder="酒店品牌" v-decorator="['brand',
+            {rules: [{required: true, message: '请输入酒店品牌'}]}]"></a-input>
+          </a-form-item>
+
           <a-form-item label="酒店地址" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-input
               placeholder="酒店地址"
@@ -90,12 +95,16 @@
             </a-select>
           </a-form-item>
 
-          <a-form-item label="酒店品牌" :labelCol="labelCol" :wrapperCol="wrapperCol">
-            <a-input
-              placeholder="酒店品牌"
-              v-decorator="['brand',
-              {rules: [{ required: true, message: '地址不能为空' }]}]"
-            ></a-input>
+          <a-form-item label="酒店位置" :labelCol="labelCol" :wrapperCol="wrapperCol">
+            <a-select v-decorator="['location', 
+            {initialValue: 'LANDMARK',rules: [{required: true, message: '请选择酒店位置'}]}]" 
+            placeholder="请选择">
+              <a-select-option value="LANDMARK">商圈/地标</a-select-option>
+              <a-select-option value="AIRPORT">机场/火车站</a-select-option>
+              <a-select-option value="TRANSPRORTATION">轨道交通</a-select-option>
+              <a-select-option value="ADMINISTRATIVE">行政区</a-select-option>
+              <a-select-option value="VIEWPOINT">景点</a-select-option>
+            </a-select>
           </a-form-item>
         </a-form>
       </a-spin>
@@ -160,6 +169,8 @@ export default {
           let imgUrl = this.fileList[0].response.data.imgUrl
           let parameter = {
             'hname': values.hname,
+            'brand': values.brand,
+            'location': values.location,
             'description': values.description,
             'facilities': values.facilities.toString(),
             'service': values.service.toString(),

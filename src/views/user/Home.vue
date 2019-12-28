@@ -210,7 +210,6 @@ import zh_CN from 'ant-design-vue/lib/locale-provider/zh_CN';
 import Header from '@/views/user/Header'
 import Footer from '@/views/user/Footer'
 import { getHotelList, getHotelDetail, getBrand, findByQuery } from '@/api/hotel'
-
 const locationMap = {
   '商圈/地标': {
     text: 'LANDMARK'
@@ -228,7 +227,6 @@ const locationMap = {
     text: 'VIEWPOINT'
   }
 }
-
 const ratesMap = {
   '公寓': {
     text: 'APARTMENT'
@@ -246,7 +244,6 @@ const ratesMap = {
     text: 'HIGNEND'
   }
 }
-
 const hotelTypesMap = {
   APARTMENT: {
     text: '公寓'
@@ -264,7 +261,6 @@ const hotelTypesMap = {
     text: '高级连锁'
   }
 }
-
 const serviceMap = {
   '接待外宾': {
     icon: 'team'
@@ -279,7 +275,6 @@ const serviceMap = {
     icon: 'bell'
   }
 }
-
 export default {
   name: 'Home',
   created: function() {
@@ -331,12 +326,10 @@ export default {
       isLoading: false
     };
   },
-
   components: {
     'v-header': Header,
     'v-footer': Footer
   },
-
  methods: {
     locationChange: function(e) {
       if (e.target.value == '不限') {
@@ -370,13 +363,11 @@ export default {
             isAdd = true
           }
         })
-
         if (!isAdd) {
           const beforeBrand = this.tags.filter(tag => this.brands.includes(tag))
           const del = beforeBrand.filter(tag => !checkedValue.includes(tag))
           this.tags = this.tags.filter(tag => !del.includes(tag))
         }
-
         this.brandNums = checkedValue
         this.brandDefault = ''
         this.cleanBtn = true
@@ -404,13 +395,11 @@ export default {
             isAdd = true
           }
         })
-
         if (!isAdd) {
           const beforeRate = this.tags.filter(tag => this.rates.includes(tag))
           const del = beforeRate.filter(tag => !checkedValue.includes(tag))
           this.tags = this.tags.filter(tag => !del.includes(tag))
         }
-
         this.rateNums = checkedValue
         this.rateDefault = ''
         this.cleanBtn = true
@@ -434,7 +423,6 @@ export default {
     priceChange: function(e) {
       let priceTag = ''
       this.priceDefault = ''
-
       if (e.target.value == 200) {
         this.minPrice = 0
         this.maxPrice = e.target.value
@@ -525,12 +513,10 @@ export default {
     loadHotel: function() {
       let rates = []
       let location = null
-
       this.rateNums.forEach(rate => rates.push(this.$options.filters['ratesFilter'](rate)))
       if (this.curLocation != null) {
         location = this.$options.filters['locationFilter'](this.curLocation)
       }
-
       let params = {
         location: location,
         brands: this.brandNums,
@@ -545,7 +531,7 @@ export default {
       // getHotelList({...this.pagination})
       findByQuery({...params, ...this.pagination}).then(res => {
         if (res.success == true) {
-          // console.log("加载酒店成功")
+           console.log("加载酒店成功")
           this.hotels = res.data.content
           this.pagination.pageNo = res.data.number + 1
           this.pagination.pageSize = res.data.size
@@ -605,7 +591,6 @@ export default {
     }
  }
 }
-
 </script>
 
 <style scoped>
@@ -620,14 +605,12 @@ export default {
     border: 1px solid #ddd;
     min-height: 200px;
   }
-
   .select-div .row-div {
     border-bottom: 1px solid #ddd;
     min-height: 30px;
     margin: 0 30px;
     padding: 20px 0;
   }
-
   .select-div .row-div .ant-col-4 {
     margin: 5px 0;
   }
@@ -637,25 +620,21 @@ export default {
     padding: 0 50px;
     min-height: 600px;
   }
-
   .tag-div {
     min-height: 44px;
     padding: 10px 0 10px 10px;
   }
-
   .tag-div .result {
     float: left;
     font-size: 12px;
     padding-right: 25px;
     color: #333;
   }
-
   .tag-div .result span {
     font-size: 14px;
     margin: 0 2px;
     color: #5babfc;
   }
-
   .sort-div {
     background-color: rgb(148, 201, 255);
     padding: 6px 20px;
@@ -663,7 +642,6 @@ export default {
     width: 100%;
     color: rgb(255, 255, 255);
   }
-
   .hotel-div {
     position: relative;
     width: 100%;
@@ -672,49 +650,40 @@ export default {
     padding: 30px 0;
     border-bottom: 1px solid #ddd;
   }
-
   .hotel-div:hover {
     background-color: #fffcf3;
   }
-
   .hotel-div .pic {
     float: left;
     width: 240px;
     height: 180px;
     margin-right: 25px;
   }
-
   .hotel-div .middle {
     float: left;
     width: 50%;
   }
-
   .hotel-div .middle .h-name {
     font-size: 20px;
   }
-
   .hotel-div .rate {
     float: right;
   }
-
   .hotel-div .rate .score {
     font-size: 16px;
     color: #5babfc;
   }
-
   .hotel-div .more {
     position: absolute;
     right: 0;
     bottom: 30px;
   }
-
   .hotel-div .more .price {
     margin: 0 3px 0 1px;
     font-size: 30px;
     color: #ff560a;
     font-weight: 700;
   }
-
   .hotel-div .more .detail-btn {
     display: block;
     width: 100px;
@@ -729,7 +698,6 @@ export default {
     text-align: center;
     line-height: 34px;
   }
-
   .content-div .pagination {
     float: right;
     margin: 30px 0;
