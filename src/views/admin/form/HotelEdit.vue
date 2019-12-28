@@ -267,12 +267,8 @@ export default {
             'phone': values.phone,
             'img': imgUrl,
             'rate': values.rate,
-<<<<<<< HEAD
-            'brand': values.brand
-=======
             'brand': values.brand,
             'location': values.location
->>>>>>> 302bc44ef65c0e7867bc7d750296658e8ac04b24
           }
           return updateHotel(parameter).then(res => {
             if (res.success === true) {
