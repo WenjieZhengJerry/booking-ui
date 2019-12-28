@@ -34,10 +34,10 @@
               {rules: [{ required: true, message: '地址不能为空' }]}]"
             ></a-input>
           </a-form-item>
-
+          <!-- action="/api/upload" -->
           <a-form-item label="酒店图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-upload
-            action="/api/upload"
+            action="/upload"
             :data="handleData"
             listType="picture-card"
             :fileList="fileList"

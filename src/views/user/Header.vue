@@ -15,7 +15,8 @@
           <a class="ant-dropdown-link" href="#"> 
             <a-row>
               <a-col :span="8">
-                <a-avatar shape="square" :size="32" icon="user" :src="'/api'+userInfo.icon"/>
+                <a-avatar shape="square" :size="32" icon="user" :src="userInfo.icon"/>
+                <!-- <a-avatar shape="square" :size="32" icon="user" :src="'/api'+userInfo.icon"/> -->
                 </a-col>
               <a-col :span="16">{{userInfo.uname}} <a-icon type="down" /> </a-col>
             </a-row>

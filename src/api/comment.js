@@ -3,7 +3,8 @@ import {
   } from '@/utils/request'
   
 const api = {
-    comment: '/api/commentManage'
+    //comment: '/api/commentManage'
+    comment: '/commentManage'
 }
 // 获取评论列表 parameter: { pageSize: 10, pageNo: 1 }
 export function getCommentList (parameter) {

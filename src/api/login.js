@@ -2,9 +2,12 @@
 import { axios } from '@/utils/request'
 
 const api = {
-  login: '/api/login',
+  /* login: '/api/login',
   register: '/api/login/register',
-  update: '/api/login/update'
+  update: '/api/login/update' */
+  login: '/login',
+  register: '/login/register',
+  update: '/login/update'
 }
 
 // 获取加密公钥

@@ -214,7 +214,8 @@ export default {
           dataIndex: 'img',
           align: 'center',
           customRender: (text) => {
-            let url = "/api" + text
+            /* let url = "/api" + text */
+            let url = text
             return <img style="width:100px;height:80px;" src={url} />
           },
           //scopedSlots: { customRender: 'img' }

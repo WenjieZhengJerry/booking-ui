@@ -4,7 +4,8 @@ import {
   } from '@/utils/request'
   
   const api = {
-    order: '/api/orderManage'
+    //order: '/api/orderManage'
+    order: '/orderManage'
   }
   
   // 获取订单列表 parameter: { pageSize: 10, pageNo: 1 }

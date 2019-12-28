@@ -147,7 +147,8 @@
                 <template v-for="(hotel, index) in hotels">
                   <div class="hotel-div" :key="index">
                     <div class="pic">
-                      <a href="javascript:;" @click="goTo(hotel.hid)"><img style="width: 100%; height: 100%" :src="'/api/' + hotel.img" /></a>
+                      <a href="javascript:;" @click="goTo(hotel.hid)"><img style="width: 100%; height: 100%" :src="hotel.img" /></a>
+                      <!-- <a href="javascript:;" @click="goTo(hotel.hid)"><img style="width: 100%; height: 100%" :src="'/api/' + hotel.img" /></a> -->
                     </div>
                     <div class="middle">
                       <p class="h-name">

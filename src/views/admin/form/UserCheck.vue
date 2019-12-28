@@ -15,9 +15,9 @@
       @cancel="handleCancel" >
 
       <a-spin :spinning="confirmLoading">
-
+        <!-- :src="'/api'+info.icon" -->
         <a-row>
-          <a-col :span="6"><a-avatar shape="square" :size="128" icon="user" :src="'/api'+info.icon"/></a-col>
+          <a-col :span="6"><a-avatar shape="square" :size="128" icon="user" :src="info.icon"/></a-col>
           <a-col :span="18">
             <a-row>
               <a-col :span="4" style="margin-bottom:0">用户id</a-col>

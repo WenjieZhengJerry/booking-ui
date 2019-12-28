@@ -21,10 +21,10 @@
             <a-input v-decorator="['rname',
             {rules: [{required: true, message: '请输入房间名字'}]}]"></a-input>
           </a-form-item>
-
+          <!-- action="/api/upload" -->
           <a-form-item label="房间图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-upload
-            action="/api/upload"
+            action="/upload"
             :data="handleData"
             listType="picture-card"
             :fileList="fileList"

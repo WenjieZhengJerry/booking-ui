@@ -3,7 +3,8 @@ import {
   } from '@/utils/request'
   
 const api = {
-    hotel: '/api/hotelManage'
+    //hotel: '/api/hotelManage'
+    hotel: '/hotelManage'
 }
 // 获取酒店列表 parameter: { pageSize: 10, pageNo: 1 }
 export function getHotelList (parameter) {

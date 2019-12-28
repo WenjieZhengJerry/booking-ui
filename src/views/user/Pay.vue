@@ -8,7 +8,8 @@
         </div>
         <div class="content">
           <div class="pic">
-            <img :src="'/api' + hotel.img" style="width: 100%; height: 100%">
+            <img :src="hotel.img" style="width: 100%; height: 100%">
+            <!-- <img :src="'/api' + hotel.img" style="width: 100%; height: 100%"> -->
           </div>
           <div class="details">
             <p class="name">{{ hotel.hname }}</p>

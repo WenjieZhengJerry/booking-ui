@@ -31,10 +31,10 @@
             <a-input :maxLength="11" v-decorator="['address',
             {rules: [{required: true, message: '请输入酒店地址'}]}]"></a-input>
           </a-form-item>
-
+          <!-- action="/api/upload" -->
           <a-form-item label="酒店图片" :labelCol="labelCol" :wrapperCol="wrapperCol">
             <a-upload
-            action="/api/upload"
+            action="/upload"
             :data="handleData"
             listType="picture-card"
             :fileList="fileList"
@@ -178,7 +178,8 @@ export default {
                 uid: '-1',
                 name: '酒店图片',
                 status: 'done',
-                url: `/api${formData.img}`,
+                url: `${formData.img}`,
+                /* url: `/api${formData.img}`, */
             }
             this.fileList.push(file)
         }

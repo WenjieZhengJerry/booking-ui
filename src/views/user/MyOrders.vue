@@ -28,7 +28,8 @@
             <div class="h-info">
               <div class="pic">
                 <a @click="detail(order)">
-                  <img :src="'/api' + order.hotel.img">
+                  <img :src="order.hotel.img">
+                  <!-- <img :src="'/api' + order.hotel.img"> -->
                 </a>
               </div>
               <div class="section">

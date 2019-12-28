@@ -46,7 +46,8 @@
           </a-col>
           <a-col :span="8">
             <a-row style="margin-top:50px;margin-bottom:20px;" type="flex" justify="space-around" align="middle">
-              <a-avatar shape="square" :size="128" icon="user" :src="'/api'+info.icon"/>
+              <a-avatar shape="square" :size="128" icon="user" :src="info.icon"/>
+              <!-- <a-avatar shape="square" :size="128" icon="user" :src="'/api'+info.icon"/> -->
             </a-row>
             <a-row v-if="isEdit" type="flex" justify="space-around" align="middle">
               <input type="file" class="file" hidden="hidden" @change="changeAvatar" ref="avatar"/>

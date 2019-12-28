@@ -3,7 +3,8 @@ import {
   } from '@/utils/request'
   
 const api = {
-    room: '/api/roomManage'
+    //room: '/api/roomManage'
+    room: '/roomManage'
 }
 // 获取房间列表 parameter: { pageSize: 10, pageNo: 1 }
 export function getRoomList (parameter) {

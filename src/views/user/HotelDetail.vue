@@ -13,10 +13,12 @@
                 <a-icon type="right-circle" />
               </div>
               <div>
-                <img :src="'/api/' + hotel.img" />
+                <img :src="hotel.img" />
+                <!-- <img :src="'/api/' + hotel.img" /> -->
               </div>
               <div v-for="(room, index) in rooms" :key="index">
-                <img :src="'/api' + room.img" />
+                <!-- <img :src="'/api' + room.img" /> -->
+                <img :src="room.img" />
               </div>
             </a-carousel>
           </div>
@@ -71,7 +73,8 @@
           <div class="room-div" v-for="(room, index) in rooms" :key="index">
             <a-row>
               <a-col :span="6">
-                <img :src="'/api/' + room.img" style="width: 250px">
+                <img :src="room.img" style="width: 250px">
+                <!-- <img :src="'/api/' + room.img" style="width: 250px"> -->
                 <div class="room-img-section">
                   {{ room.rname }}
                   <a-tooltip placement="right">
@@ -184,7 +187,8 @@
                     <template v-if="(badComment+middleComment+goodComment) > 0">
                       <div class="user-review-box" v-for="(comment, index) in comments" :key="index">
                         <div class="user-img">
-                          <a-avatar :size="80" :src="'/api' + comment.user.icon" />
+                          <a-avatar :size="80" :src="comment.user.icon" />
+                          <!-- <a-avatar :size="80" :src="'/api' + comment.user.icon" /> -->
                           <span>{{ comment.user.uname }}</span>
                         </div>
                         <div class="review-comment">
@@ -216,7 +220,8 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'PRAISE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="'/api' + comment.user.icon" />
+                            <a-avatar :size="80" :src="comment.user.icon" />
+                            <!-- <a-avatar :size="80" :src="'/api' + comment.user.icon" /> -->
                             <span>{{ comment.user.uname }}</span>
                           </div>
                           <div class="review-comment">
@@ -249,7 +254,8 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'AVERAGE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="'/api' + comment.user.icon" />
+                            <a-avatar :size="80" :src="comment.user.icon" />
+                            <!-- <a-avatar :size="80" :src="'/api' + comment.user.icon" /> -->
                             <span>{{ comment.user.uname }}</span>
                           </div>
                           <div class="review-comment">
@@ -282,7 +288,8 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'CRITICIZE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="'/api' + comment.user.icon" />
+                            <a-avatar :size="80" :src="comment.user.icon" />
+                            <!-- <a-avatar :size="80" :src="'/api' + comment.user.icon" /> -->
                             <span>{{ comment.user.uname }}</span>
                           </div>
                           <div class="review-comment">

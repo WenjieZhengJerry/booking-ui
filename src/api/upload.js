@@ -4,7 +4,8 @@
   } from '@/utils/request'
   
   const api = {
-    upload: '/api/upload'
+    //upload: '/api/upload'
+    upload: '/upload'
   }
 
   // 文件上传 parameter: { directoryName: hotel/room, img: file }

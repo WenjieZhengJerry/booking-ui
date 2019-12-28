@@ -2,7 +2,8 @@
 import { axios } from '@/utils/request'
 
 const api = {
-  user: '/api/user'
+  //user: '/api/user'
+  user: '/user'
 }
 
 // 根据用户 id 获取用户信息

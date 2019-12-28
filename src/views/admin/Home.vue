@@ -58,7 +58,8 @@ export default {
  data () {
     return {
       uName: '小泽又沐风',
-      avatarImg: '/api/upload/user/avatar/default_avatar.jpeg',
+      avatarImg: '/upload/user/avatar/default_avatar.jpeg',
+      /* avatarImg: '/api/upload/user/avatar/default_avatar.jpeg', */
       userInfo:{}
    };
  },
