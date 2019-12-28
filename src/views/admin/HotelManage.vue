@@ -41,8 +41,25 @@
             <a-button @click="handleCleanRate" :style="{ marginLeft: '8px' }">清空</a-button>
           </a-form-item>
         </a-col>
+        <a-col key="6" :span="8" >
+          <a-form-item label="酒店品牌">
+            <a-input allowClear v-decorator="['brandKey']" />
+          </a-form-item>
+        </a-col>
+        <a-col key="7" :span="8" >
+          <a-form-item label="酒店位置">
+            <a-select v-decorator="['locationKey']" 
+            placeholder="请选择" style="width:200px">
+              <a-select-option value="LANDMARK">商圈/地标</a-select-option>
+              <a-select-option value="AIRPORT">机场/火车站</a-select-option>
+              <a-select-option value="TRANSPRORTATION">轨道交通</a-select-option>
+              <a-select-option value="ADMINISTRATIVE">行政区</a-select-option>
+              <a-select-option value="VIEWPOINT">景点</a-select-option>
+            </a-select>
+          </a-form-item>
+        </a-col>
 
-        <a-col key="6" :span="8" :style="{ textAlign: 'left' }">
+        <a-col key="8" :span="8" :style="{ textAlign: 'left' }">
           <a-button type="primary" html-type="submit" :style="{ marginLeft: '8px' }">
             查询
           </a-button>
@@ -81,11 +98,21 @@
       </span> -->
       <!--1.较长内容使用ellipsis插件省略显示-->
       <span slot="description" slot-scope="text">
-        <ellipsis :length="30" tooltip>{{ text }}</ellipsis>
+        <ellipsis :length="10" tooltip>{{ text }}</ellipsis>
+      </span>
+      <span slot="address" slot-scope="text">
+        <ellipsis :length="10" tooltip>{{ text }}</ellipsis>
+      </span>
+      <span slot="hname" slot-scope="text">
+        <ellipsis :length="10" tooltip>{{ text }}</ellipsis>
       </span>
       <!-- 2.酒店类型：枚举适配显示 -->
       <span slot="type" slot-scope="text">
         {{text | typeFilter}}
+      </span>
+      <!-- 3.酒店位置：枚举适配显示 -->
+      <span slot="location" slot-scope="text">
+        {{text | locationFilter}}
       </span>
       <!-- <span slot="createTime" slot-scope="text">{{ text | moment('YYYY/MM/DD hh:mm:ss') }}</span>
       <span slot="orderStatus" slot-scope="text">
@@ -138,6 +165,24 @@ const hotelTypeMap = {
   }
 }
 
+const LocationMap = {
+  LANDMARK: {
+    text: '商圈/地标'
+  },
+  AIRPORT: {
+    text: '机场/火车站'
+  },
+  TRANSPRORTATION: {
+    text: '轨道交通'
+  },
+  ADMINISTRATIVE: {
+    text: '行政区'
+  },
+  VIEWPOINT: {
+    text: '景点'
+  }
+}
+
 export default {
  name: 'HotelManage',
  components: {
@@ -149,6 +194,9 @@ export default {
  filters: {
    typeFilter (type) {
      return hotelTypeMap[type].text
+   },
+   locationFilter (location) {
+     return LocationMap[location].text
    }
  },
  data () {
@@ -174,12 +222,25 @@ export default {
         {
           title: '酒店名字',
           dataIndex: 'hname',
+          align: 'center',
+          scopedSlots: { customRender: 'hname' }
+        },
+        {
+          title: '品牌',
+          dataIndex: 'brand',
           align: 'center'
         },
         {
           title: '地址',
           dataIndex: 'address',
-          align: 'center'
+          align: 'center',
+          scopedSlots: { customRender: 'address' }
+        },
+        {
+          title: '位置',
+          dataIndex: 'location',
+          align: 'center',
+          scopedSlots: { customRender: 'location' }
         },
         {
           title: '描述',
