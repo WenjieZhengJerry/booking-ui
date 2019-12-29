@@ -12,7 +12,7 @@ $ npm start
 [点击这里跳转到booking后端源码](https://github.com/acodebird/booking)
 
 ## 更新日志
-- 2019年12月29日：分支production为服务器部署版本，运行npm run build后将dist下的文件复制到springboot项目下的resource下的static目录，启动springboot项目后直接访问springboot项目即可
+- 2019年12月29日：分支production为服务器部署版本，运行npm run build后将dist下的文件复制到springboot项目下的resource下的static目录，启动springboot项目后直接访问springboot项目即可(解决确认订单页面、订单详情页面、订单列表在服务器样式显示问题)
 - 2019年12月28日：酒店添加新字段后,修改后台酒店管理各个功能
 - 2019年12月27日：完成后台评论管理等功能、完成用户界面评论的分页显示等功能、完成订单评价功能；完成首页酒店多条件查询功能
 - 2019年12月25日：新增订单自动取消功能、增加酒店最低价字段
