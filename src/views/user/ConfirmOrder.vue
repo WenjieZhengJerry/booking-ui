@@ -423,7 +423,7 @@ export default {
 /* --------------------------left-------------------------- */
 .left {
   float: left;
-  width: 1060px;
+  width: 960px;
   box-sizing: border-box;
   background: #fff;
   border: 1px solid #ddd;

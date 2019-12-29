@@ -187,7 +187,7 @@
                     <template v-if="(badComment+middleComment+goodComment) > 0">
                       <div class="user-review-box" v-for="(comment, index) in comments" :key="index">
                         <div class="user-img">
-                          <a-avatar :size="80" :src="comment.user.icon" />
+                          <a-avatar :size="60" :src="comment.user.icon" />
                           <!-- <a-avatar :size="80" :src="'/api' + comment.user.icon" /> -->
                           <span>{{ comment.user.uname }}</span>
                         </div>
@@ -220,7 +220,7 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'PRAISE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="comment.user.icon" />
+                            <a-avatar :size="60" :src="comment.user.icon" />
                             <!-- <a-avatar :size="80" :src="'/api' + comment.user.icon" /> -->
                             <span>{{ comment.user.uname }}</span>
                           </div>
@@ -254,7 +254,7 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'AVERAGE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="comment.user.icon" />
+                            <a-avatar :size="60" :src="comment.user.icon" />
                             <!-- <a-avatar :size="80" :src="'/api' + comment.user.icon" /> -->
                             <span>{{ comment.user.uname }}</span>
                           </div>
@@ -288,7 +288,7 @@
                       <div v-for="(comment, index) in comments" :key="index">
                         <div class="user-review-box" v-if="comment.type == 'CRITICIZE'">
                           <div class="user-img">
-                            <a-avatar :size="80" :src="comment.user.icon" />
+                            <a-avatar :size="60" :src="comment.user.icon" />
                             <!-- <a-avatar :size="80" :src="'/api' + comment.user.icon" /> -->
                             <span>{{ comment.user.uname }}</span>
                           </div>
@@ -601,7 +601,7 @@ export default {
 }
 /* --------------------info------------------------- */
 .info-detail {
-  width: 540px;
+  width: 420px;
   padding: 0 20px;
   font-size: 14px;
   color: #333;
@@ -800,7 +800,7 @@ export default {
 
 .detail-tab .review-comment {
   float: left;
-  width: 1023px;
+  width: 823px;
   padding-top: 10px;
   padding-bottom: 20px;
   border-bottom: 1px solid #ddd;

@@ -321,7 +321,7 @@ export default {
 }
 
 .order-list .h-info .section {
-  width: 250px;
+  width: 200px;
   box-sizing: border-box;
   -webkit-box-sizing: border-box;
   float: left;
@@ -345,7 +345,7 @@ export default {
 
 .order-list .price-box {
   float: left;
-  width: 152px;
+  width: 122px;
   text-align: center;
   font-size: 0;
   height: 100%;
@@ -394,7 +394,7 @@ export default {
 
 .order-list .btn-box {
   float: left;
-  width: 210px;
+  width: 140px;
   text-align: center;
   height: 100%;
   padding: 25px;
