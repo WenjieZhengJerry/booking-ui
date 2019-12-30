@@ -69,6 +69,7 @@ function submitLoginInfo (info,cb) {
       cb(0,'登录成功')
       return
     }
+    alert(res.data)
     cb(1,`登录失败: ${errorTipsMap[res.data]}`)
   }).catch(ex => {
     cb(2,'请求出现错误，请稍后再试')

@@ -27,7 +27,7 @@
         <a-dropdown style="float: right;">
           <a class="ant-dropdown-link" href="#" style="margin-right: 16px;">
             <a-row>
-              <a-col :span="7"><a-avatar shape="square" :size="32" icon="user" :src="avatarImg"/></a-col>
+              <a-col :span="7"><a-avatar shape="square" :size="32" icon="user" :src="'/api'+userInfo.icon"/></a-col>
               <a-col :span="17">{{userInfo.uname}} <a-icon type="down" /> </a-col>
             </a-row>
           </a>
